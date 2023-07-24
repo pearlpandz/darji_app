@@ -1,23 +1,41 @@
-import React from 'react'
-import { SafeAreaView, StatusBar, Text, View, StyleSheet, ScrollView, Dimensions, Image, TextInput, Pressable, TouchableHighlight } from 'react-native'
-import Navigation from '../../../reusables/navigation'
+/* eslint-disable react-native/no-inline-styles */
+import React from 'react';
+import {
+  SafeAreaView,
+  StatusBar,
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  Image,
+  TextInput,
+  Pressable,
+  TouchableHighlight,
+} from 'react-native';
+import Navigation from '../../../reusables/navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MEN_IMAGE from './../../../assets/images/men.png';
 import WOMEN_IMAGE from './../../../assets/images/women.jpg';
 import AVATAR from './../../../assets/images/avatar.png';
 import GET_A_QUOTE from './../../../assets/images/getquote.png';
 
-function HomePage({ navigation }) {
-  
-
+function HomePage({navigation}) {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f7f7f7' }}>
-      <ScrollView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#f7f7f7'}}>
+      <ScrollView style={{flex: 1}}>
         <View style={styles.banner}>
           <Text style={styles.bannerTitle}>Welcome to Tailor Shop</Text>
           <View style={styles.hr} />
-          <Text style={styles.bannerDesc}>One stop shop for your tailoring needs</Text>
-          <View style={[styles.inputContainer, styles.boxWithShadow, { marginBottom: 15 }]}>
+          <Text style={styles.bannerDesc}>
+            One stop shop for your tailoring needs
+          </Text>
+          <View
+            style={[
+              styles.inputContainer,
+              styles.boxWithShadow,
+              {marginBottom: 15},
+            ]}>
             <TextInput
               style={styles.input}
               placeholder=""
@@ -30,52 +48,111 @@ function HomePage({ navigation }) {
         <View>
           <Text style={styles.sectionTitle}>popular near you</Text>
           <View style={styles.cards}>
-            <Pressable onPress={() => navigation.navigate('selectdesign', {
-              title: 'Men',
-              gender: 'male',
-              uri: MEN_IMAGE
-            })}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate('selectdesign', {
+                  title: 'Men',
+                  gender: 'male',
+                  uri: MEN_IMAGE,
+                })
+              }>
               <View style={[styles.card, styles.boxWithShadow]}>
                 <Image source={MEN_IMAGE} style={styles.cardImage} />
                 <View style={styles.cardDetails}>
                   <View style={[styles.iconView, styles.boxWithShadow]}>
-                    <Ionicons name="male-outline" size={22} color='#e8875b' />
+                    <Ionicons name="male-outline" size={22} color="#e8875b" />
                   </View>
-                  <Text style={{ textTransform: 'uppercase', fontWeight: '500', textAlign: 'center' }}>men</Text>
-                  <Text style={{ fontSize: 12, color: '#7e8082', textAlign: 'center' }}>Stylish and Handsome Look</Text>
+                  <Text
+                    style={{
+                      textTransform: 'uppercase',
+                      fontWeight: '500',
+                      textAlign: 'center',
+                    }}>
+                    men
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: '#7e8082',
+                      textAlign: 'center',
+                    }}>
+                    Stylish and Handsome Look
+                  </Text>
                 </View>
               </View>
             </Pressable>
-            {/* onPress={() => navigation.navigate('selectdesign', {
-              title: 'Women',
-              gender: 'female',
-              uri: WOMEN_IMAGE
-            })} */}
-            <Pressable>
-              <View style={[styles.card, styles.boxWithShadow, { marginRight: 0 }]}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate('Common', {screen: 'commingSoon'})
+              }>
+              <View
+                style={[styles.card, styles.boxWithShadow, {marginRight: 0}]}>
                 <Image source={WOMEN_IMAGE} style={styles.cardImage} />
                 <View style={styles.cardDetails}>
                   <View style={[styles.iconView, styles.boxWithShadow]}>
-                    <Ionicons name="female-outline" size={22} color='#e8875b' />
+                    <Ionicons name="female-outline" size={22} color="#e8875b" />
                   </View>
-                  <Text style={{ textTransform: 'uppercase', fontWeight: '500', textAlign: 'center' }}>women</Text>
-                  <Text style={{ fontSize: 12, color: '#7e8082', textAlign: 'center' }}>Coming Soon</Text>
+                  <Text
+                    style={{
+                      textTransform: 'uppercase',
+                      fontWeight: '500',
+                      textAlign: 'center',
+                    }}>
+                    women
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: '#7e8082',
+                      textAlign: 'center',
+                    }}>
+                    Coming Soon
+                  </Text>
                 </View>
               </View>
             </Pressable>
           </View>
         </View>
 
-        <View style={{ marginTop: 15 }}>
+        <View style={{marginTop: 15}}>
           <Text style={styles.sectionTitle}>get quote</Text>
-          <View style={{ paddingHorizontal: 20 }}>
-            <View style={{ backgroundColor: '#e8875b', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center' }}>
-              <View style={{ width: 60, height: 60, borderRadius: 10, overflow: 'hidden', marginRight: 15 }}>
-                <Image style={{ flex: 1, width: '100%' }} source={GET_A_QUOTE} resizeMode="cover" />
+          <View style={{paddingHorizontal: 20}}>
+            <View
+              style={{
+                backgroundColor: '#e8875b',
+                padding: 15,
+                borderRadius: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  marginRight: 15,
+                }}>
+                <Image
+                  style={{flex: 1, width: '100%'}}
+                  source={GET_A_QUOTE}
+                  resizeMode="cover"
+                />
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold', textTransform: 'capitalize' }}>assured best quote</Text>
-                <Text style={{ fontSize: 12, color: '#fff' }}>Reference site about Lorem Ipsum, giving information on its origins</Text>
+              <View style={{flex: 1}}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    textTransform: 'capitalize',
+                  }}>
+                  assured best quote
+                </Text>
+                <Text style={{fontSize: 12, color: '#fff'}}>
+                  Reference site about Lorem Ipsum, giving information on its
+                  origins
+                </Text>
               </View>
             </View>
           </View>
@@ -99,10 +176,9 @@ function HomePage({ navigation }) {
             }
           </View>
         </View> */}
-
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -111,37 +187,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     paddingHorizontal: 15,
-    paddingVertical: 20
+    paddingVertical: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     paddingHorizontal: 20,
     marginBottom: 15,
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   cards: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   card: {
     flexDirection: 'column',
     alignItems: 'center',
-    width: ((Dimensions.get('screen').width) - 60) / 2,
+    width: (Dimensions.get('screen').width - 60) / 2,
     borderRadius: 10,
     marginBottom: 10,
     marginRight: 20,
     justifyContent: 'space-between',
     backgroundColor: '#ffffff',
     borderRadius: 6,
-    overflow: 'hidden'
+    overflow: 'hidden',
   },
   cardDetails: {
     padding: 10,
     paddingTop: 30,
     position: 'relative',
-    width: '100%'
+    width: '100%',
   },
   iconView: {
     position: 'absolute',
@@ -158,16 +234,16 @@ const styles = StyleSheet.create({
   },
   boxWithShadow: {
     shadowColor: '#666',
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 15
+    elevation: 15,
   },
   cardImage: {
     height: 120,
     flex: 1,
     width: '100%',
-    color: '#75bbb9'
+    color: '#75bbb9',
   },
   horizontalAlign: {
     flexDirection: 'row',
@@ -179,7 +255,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     marginLeft: 15,
     color: '#fff',
-    width: Dimensions.get('screen').width - 200
+    width: Dimensions.get('screen').width - 200,
   },
   banner: {
     backgroundColor: '#86bcbf',
@@ -187,7 +263,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     position: 'relative',
     paddingBottom: 50,
-    marginBottom: 30
+    marginBottom: 30,
   },
   bannerTitle: {
     fontSize: 30,
@@ -200,12 +276,12 @@ const styles = StyleSheet.create({
   bannerDesc: {
     fontSize: 18,
     color: '#fff',
-    marginTop: 10
+    marginTop: 10,
   },
   hr: {
     height: 2,
     width: 100,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -217,13 +293,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -30,
     left: 20,
-    width: Dimensions.get('screen').width - 40
+    width: Dimensions.get('screen').width - 40,
   },
   inputInsideIcon: {
     paddingHorizontal: 18,
     paddingVertical: 14,
     backgroundColor: '#e8865b',
-    color: '#fff'
+    color: '#fff',
   },
   input: {
     flex: 1,
@@ -237,8 +313,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     flexDirection: 'row',
-    marginBottom: 10
-  }
-})
+    marginBottom: 10,
+  },
+});
 
-export default HomePage
+export default HomePage;

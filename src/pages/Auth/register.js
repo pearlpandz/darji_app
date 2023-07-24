@@ -10,14 +10,10 @@ import {
   Dimensions,
   ScrollView,
   LogBox,
-  Platform,
-  AlertIOS,
-  Alert,
 } from 'react-native';
 import Checkbox from '@react-native-community/checkbox';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import Button from '../../reusables/button';
-import axios from 'axios';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {
   LoginManager,
@@ -25,7 +21,6 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
-import {HOST} from '../../../env';
 
 const ANDROID_CLIENT_ID =
   '280676335640-s4fv6lmjr0tqlb81thts0lnmct5d9ig6.apps.googleusercontent.com';
@@ -38,7 +33,6 @@ function Register({navigation}) {
   const [isSelectedTerms, setSelectionTerms] = useState(false);
   const [formdata, setFormdata] = useState({
     name: {value: '', isValid: false},
-    mobileNumber: {value: '', isValid: false},
     password: {value: '', isValid: false},
     email: {value: '', isValid: false},
   });
@@ -46,7 +40,6 @@ function Register({navigation}) {
   const reset = () => {
     setFormdata({
       name: {value: '', isValid: false},
-      mobileNumber: {value: '', isValid: false},
       password: {value: '', isValid: false},
       email: {value: '', isValid: false},
     });
@@ -66,32 +59,14 @@ function Register({navigation}) {
   };
 
   const handleSubmit = async () => {
-    try {
-      const payload = {
-        name: formdata.name.value,
-        mobile_number: formdata.mobileNumber.value,
-        password: formdata.password.value,
-        email: formdata.email.value,
-      };
-      const url = `${HOST}/api/register`;
-      const {data} = await axios.post(url, payload);
-      if (data) {
-        console.log('data', data);
-        navigation.navigate('otp', {...payload, provider: 'oauth'});
-        reset();
-      }
-    } catch (error) {
-      const msg = error?.response?.data
-        ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
-        : 'Something went wrong!';
-      if (Platform.OS === 'android') {
-        Alert.alert('Warning', msg);
-      } else {
-        AlertIOS.alert(msg);
-      }
-    }
+    const payload = {
+      name: formdata.name.value,
+      password: formdata.password.value,
+      email: formdata.email.value,
+      provider: 'oauth',
+    };
+    navigation.navigate('otp', {payload});
+    reset();
   };
 
   const isFormValid = () => {
@@ -99,25 +74,7 @@ function Register({navigation}) {
   };
 
   const socialRegister = async payload => {
-    try {
-      const url = `${HOST}/api/register`;
-      const {data} = await axios.post(url, payload);
-      if (data) {
-        console.log(data);
-        navigation.navigate('otp', {mobileNumber: null, payload: data});
-      }
-    } catch (error) {
-      console.log(JSON.stringify(error.response.data));
-      const msg =
-        Object.values(error.response.data.error)
-          .map(a => a.toString())
-          .join(', ') || 'Something went wrong!';
-      if (Platform.OS === 'android') {
-        Alert.alert('Warning', msg);
-      } else {
-        AlertIOS.alert(msg);
-      }
-    }
+    navigation.navigate('otp', {payload});
   };
 
   const registerByGoogle = user => {
@@ -192,26 +149,6 @@ function Register({navigation}) {
                 value={formdata.email.value.toString() || ''}
                 onChangeText={searchString => {
                   handleChange('email', searchString);
-                }}
-                underlineColorAndroid="transparent"
-              />
-            </View>
-
-            {/* Mobile Number */}
-            <View style={[styles.inputContainer, {marginBottom: 15}]}>
-              <IonIcons
-                style={styles.inputInsideIcon}
-                name="call-outline"
-                size={18}
-                color="#b9b9b9"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Mobile Number"
-                keyboardType="number-pad"
-                value={formdata.mobileNumber.value}
-                onChangeText={searchString => {
-                  handleChange('mobileNumber', searchString);
                 }}
                 underlineColorAndroid="transparent"
               />
@@ -323,6 +260,10 @@ function Register({navigation}) {
                         console.log('Login cancelled');
                       } else {
                         AccessToken.getCurrentAccessToken().then(data => {
+                          console.log(
+                            'AccessToken.getCurrentAccessToken()',
+                            data,
+                          );
                           const accessToken = data.accessToken.toString();
                           getInfoFromToken(accessToken);
                         });

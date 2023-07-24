@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  TextInput,
   Dimensions,
   Platform,
   AlertIOS,
@@ -18,19 +19,46 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../../services/context';
 import Button from '../../reusables/button';
 
+import IonIcons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
 import {HOST} from '../../../env';
 
-function OtpValidation({route}) {
-  const {mobile_number: mobileNumber} = route.params;
+function OtpValidation({route, navigation}) {
+  const {payload} = route.params;
+  const mobileNumber = payload.mobile_number;
+  const [mobile, setMobileNumber] = useState(false);
   const [enteredOtp, setEnteredOtp] = useState();
   const {setAuthStatus} = useContext(AuthContext);
+  const [confirm, setConfirm] = useState(null);
+
+  const registerUser = async () => {
+    try {
+      const url = `${HOST}/api/register`;
+      const _payload = payload;
+      _payload.mobile_number = mobile;
+      await axios.post(url, payload);
+      setConfirm(true);
+    } catch (error) {
+      const msg = error?.response?.data
+        ? Object.values(error.response.data.error)
+            .map(a => a.toString())
+            .join(', ')
+        : 'Something went wrong!';
+      if (Platform.OS === 'android') {
+        Alert.alert('Warning', msg);
+      } else {
+        AlertIOS.alert(msg);
+      }
+    }
+  };
 
   const getOtp = async () => {
     try {
       const url = `${HOST}/api/forgetpassword`;
-      await axios.post(url, {mobile_number: mobileNumber});
+      const _payload = {mobile_number: mobile};
+      await axios.post(url, _payload);
+      setConfirm(true);
     } catch (error) {
       console.log(JSON.stringify(error.response.data));
       const msg =
@@ -49,8 +77,8 @@ function OtpValidation({route}) {
     try {
       console.log('-------------- otp verified -----------------');
       const url = `${HOST}/api/verifyMobileNumber`;
-      const payload = {mobile_number: mobileNumber, otp: enteredOtp};
-      const {data} = await axios.put(url, payload);
+      const _payload = {mobile_number: mobile, otp: enteredOtp};
+      const {data} = await axios.put(url, _payload);
       console.log(data);
       if (data) {
         console.log('-------------- otp verified -----------------');
@@ -76,73 +104,111 @@ function OtpValidation({route}) {
 
   const verifyMobileNumber = async () => {
     try {
+      console.log(enteredOtp);
       await _verifyMobileNumber();
     } catch (error) {
-      Alert('Invalid code.');
+      console.log('Invalid code.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
-        <Text
-          style={{
-            textTransform: 'uppercase',
-            fontSize: 16,
-            fontWeight: 'bold',
-            letterSpacing: 0.5,
-            marginBottom: 20,
-          }}>
-          enter 6-digit code
-        </Text>
-        <Text
-          style={{
-            color: '#585758',
-          }}>
-          We have sent a code to{' '}
-          <Text style={{fontWeight: 'bold'}}>{mobileNumber},</Text>
-        </Text>
+      {confirm ? (
+        <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
+          <Text
+            style={{
+              textTransform: 'uppercase',
+              fontSize: 16,
+              fontWeight: 'bold',
+              letterSpacing: 0.5,
+              marginBottom: 20,
+            }}>
+            enter 6-digit code
+          </Text>
+          <Text
+            style={{
+              color: '#585758',
+            }}>
+            We have sent a code to{' '}
+            <Text style={{fontWeight: 'bold'}}>{mobileNumber || mobile},</Text>
+          </Text>
 
-        <View style={{alignItems: 'center', marginVertical: 25}}>
-          <OTPInputView
-            style={{width: '60%', height: 50}}
-            pinCount={6}
-            autoFocusOnLoad
-            codeInputFieldStyle={styles.underlineStyleBase}
-            codeInputHighlightStyle={styles.underlineStyleHighLighted}
-            placeholderTextColor="red"
-            onCodeFilled={code => {
-              setEnteredOtp(code);
-              console.log(`Code is ${code}, you are good to go!`);
-            }}
-          />
-        </View>
+          <View style={{alignItems: 'center', marginVertical: 25}}>
+            <OTPInputView
+              style={{width: '60%', height: 50}}
+              pinCount={6}
+              autoFocusOnLoad
+              codeInputFieldStyle={styles.underlineStyleBase}
+              codeInputHighlightStyle={styles.underlineStyleHighLighted}
+              placeholderTextColor="red"
+              onCodeFilled={code => {
+                setEnteredOtp(code);
+                console.log(`Code is ${code}, you are good to go!`);
+              }}
+            />
+          </View>
 
-        <View style={[styles.btnContainer]}>
-          {/* <Button label='cancel' type='secondary' onPress={() => navigation.goBack()} width={150} /> */}
-          <Button
-            label="verify"
-            type="primary"
-            onPress={async () => {
-              verifyMobileNumber();
-            }}
-          />
-        </View>
+          <View style={[styles.btnContainer]}>
+            {/* <Button label='cancel' type='secondary' onPress={() => navigation.goBack()} width={150} /> */}
+            <Button
+              label="verify"
+              type="primary"
+              onPress={async () => {
+                verifyMobileNumber();
+              }}
+            />
+          </View>
 
-        <View style={{alignItems: 'center'}}>
-          <Button type="disabled" label="Resend code in 00:39" width={180} />
-          <View style={{marginVertical: 10}} />
-          <Button
-            type="primaryoutline"
-            label="Resend Code"
-            width={'auto'}
-            onPress={() => {
-              console.log('get the otp again....');
-              getOtp();
-            }}
-          />
+          <View style={{alignItems: 'center'}}>
+            <Button
+              type="disabled"
+              label="Resend code in 00:39"
+              width={'auto'}
+            />
+            <View style={{marginVertical: 10}} />
+            <Button
+              type="primaryoutline"
+              label="Resend Code"
+              width={'auto'}
+              onPress={() => {
+                console.log('get the otp again....');
+                getOtp();
+              }}
+            />
+          </View>
         </View>
-      </View>
+      ) : (
+        <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
+          {/* Mobile Number */}
+          <View style={[styles.inputContainer, {marginBottom: 15}]}>
+            <IonIcons
+              style={styles.inputInsideIcon}
+              name="call-outline"
+              size={18}
+              color="#b9b9b9"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Mobile Number"
+              keyboardType="number-pad"
+              value={mobile}
+              onChangeText={searchString => {
+                setMobileNumber(searchString);
+              }}
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <View style={{alignItems: 'center'}}>
+            <Button
+              type="primary"
+              label="get otp"
+              width={120}
+              disabled={!mobile}
+              onPress={() => registerUser()}
+            />
+          </View>
+        </View>
+      )}
     </View>
   );
 }
