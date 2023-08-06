@@ -69,7 +69,6 @@ function Login({navigation}) {
       dispatch(setLoader(true));
       const url = `${HOST}/api/socialLogin`;
       console.log('--------------social login------------');
-      console.log(payload);
       const {data} = await axios.post(url, payload);
       if (data) {
         dispatch(setLoader(false));
@@ -79,8 +78,7 @@ function Login({navigation}) {
       }
     } catch (error) {
       dispatch(setLoader(false));
-      console.log(error.status);
-      console.log(error.response.data);
+      console.log('error.status', error);
       const msg =
         Object.values(error.response.data)
           .map(a => a.toString())

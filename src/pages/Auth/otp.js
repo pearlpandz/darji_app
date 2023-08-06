@@ -25,7 +25,7 @@ import axios from 'axios';
 import {HOST} from '../../../env';
 
 function OtpValidation({route, navigation}) {
-  const {payload} = route.params;
+  const {payload, type = 'register'} = route.params;
   const mobileNumber = payload.mobile_number;
   const [mobile, setMobileNumber] = useState(false);
   const [enteredOtp, setEnteredOtp] = useState();
@@ -82,9 +82,13 @@ function OtpValidation({route, navigation}) {
       console.log(data);
       if (data) {
         console.log('-------------- otp verified -----------------');
-        setAuthStatus(true);
-        await AsyncStorage.setItem('isAuthenticated', String(true));
-        ToastAndroid.show('Mobile Number verified!', ToastAndroid.SHORT);
+        if (type === 'register') {
+          setAuthStatus(true);
+          await AsyncStorage.setItem('isAuthenticated', String(true));
+          ToastAndroid.show('Mobile Number verified!', ToastAndroid.SHORT);
+        } else {
+          navigation.navigate('setpassword');
+        }
       }
     } catch (error) {
       console.log(error);
@@ -204,7 +208,9 @@ function OtpValidation({route, navigation}) {
               label="get otp"
               width={120}
               disabled={!mobile}
-              onPress={() => registerUser()}
+              onPress={() => {
+                registerUser();
+              }}
             />
           </View>
         </View>

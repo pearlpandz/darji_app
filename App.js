@@ -60,6 +60,7 @@ import store from './src/redux/store';
 import {Provider} from 'react-redux';
 import SelectMeasurement from './src/pages/App/home/selectMeasurement';
 import CommingSoon from './src/pages/Auth/comingsoon';
+import SetPassword from './src/pages/App/settings/setpassword';
 
 const Drawer = createDrawerNavigator();
 const DrawerScreen = () => {
@@ -295,6 +296,19 @@ const AuthStackScreen = () => (
       options={{
         headerShown: true,
         title: 'Forget Password',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontSize: 16,
+          fontWeight: 'bold',
+        },
+      }}
+    />
+    <AuthStack.Screen
+      name="setpassword"
+      component={SetPassword}
+      options={{
+        headerShown: true,
+        title: 'Change Password',
         headerTitleAlign: 'center',
         headerTitleStyle: {
           fontSize: 16,

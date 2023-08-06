@@ -65,7 +65,7 @@ function Register({navigation}) {
       email: formdata.email.value,
       provider: 'oauth',
     };
-    navigation.navigate('otp', {payload});
+    navigation.navigate('otp', {payload, type: 'register'});
     reset();
   };
 
@@ -74,7 +74,7 @@ function Register({navigation}) {
   };
 
   const socialRegister = async payload => {
-    navigation.navigate('otp', {payload});
+    navigation.navigate('otp', {payload, type: 'register'});
   };
 
   const registerByGoogle = user => {
