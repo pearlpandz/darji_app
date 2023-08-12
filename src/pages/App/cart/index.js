@@ -68,7 +68,7 @@ function CartPage({navigation}) {
       value: 'orderDeliveryStatus.complete',
     },
   ];
-  const [selectedType, setType] = useState();
+  const [selectedType, setType] = useState(ACTIONITEMS[0].value);
   const [actionSheet, setActionSheet] = useState(false);
   const [orders, setOrders] = useState([]);
   const [orderId, setOrderid] = useState();
@@ -204,7 +204,7 @@ function CartPage({navigation}) {
               styles.boxWithShadow,
               {height: 100, alignItems: 'center', justifyContent: 'center'},
             ]}>
-            <Text>No orders found</Text>
+            <Text>No {orderStatus} orders found</Text>
           </View>
         )}
       </>
