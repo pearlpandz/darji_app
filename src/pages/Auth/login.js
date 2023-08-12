@@ -27,7 +27,7 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
-import {AuthContext} from '../../services/context';
+import {AuthContext, CurrentUserContext} from '../../services/context';
 import axios from 'axios';
 import {HOST} from '../../../env';
 import {useDispatch} from 'react-redux';
@@ -46,6 +46,7 @@ LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 function Login({navigation}) {
   const dispatch = useDispatch();
+  const {setSession} = useContext(CurrentUserContext);
   const [showPassword, setShowPassword] = useState(false);
   const {setAuthStatus} = useContext(AuthContext);
   const [formdata, setFormdata] = useState({
@@ -75,6 +76,7 @@ function Login({navigation}) {
         setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
         await AsyncStorage.setItem('token', data.token);
+        dispatch(setSession(data.userinfo));
         ToastAndroid.show('Successfully Loggedin!', ToastAndroid.SHORT);
       }
     } catch (error) {
@@ -140,6 +142,7 @@ function Login({navigation}) {
         setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
         await AsyncStorage.setItem('token', data.token);
+        dispatch(setSession(data.userinfo));
         ToastAndroid.show('Successfully LoggedIn!', ToastAndroid.SHORT);
       }
     } catch (error) {

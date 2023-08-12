@@ -49,3 +49,4 @@ Issues
 - [x] Design my self / collar and other custimzation options are not changing in reference image
 - [x] My profile is not working from menu button / Conent in my profile ( Name ,Adress(editable) , Mobile number (Editable ),Orders )
 - [ ] Items that addeded in cart is not editable 
+- [ ] Sidebar profile information is not showing properly
