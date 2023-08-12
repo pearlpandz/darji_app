@@ -45,9 +45,9 @@ function CollorOptions({data, selected, setSelected}) {
                   style={{
                     color: '#FFF',
                     fontWeight: 'bold',
-                    fontSize: 10,
+                    fontSize: 7,
                   }}>
-                  Popular
+                  Pouplar
                 </Text>
               </View>
             </View>

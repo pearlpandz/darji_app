@@ -74,6 +74,7 @@ function Login({navigation}) {
         dispatch(setLoader(false));
         setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
+        await AsyncStorage.setItem('token', data.token);
         ToastAndroid.show('Successfully Loggedin!', ToastAndroid.SHORT);
       }
     } catch (error) {
@@ -138,6 +139,7 @@ function Login({navigation}) {
         dispatch(setLoader(false));
         setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
+        await AsyncStorage.setItem('token', data.token);
         ToastAndroid.show('Successfully LoggedIn!', ToastAndroid.SHORT);
       }
     } catch (error) {

@@ -58,7 +58,7 @@ function DesginByMyself({navigation}) {
         break;
       }
       default: {
-        navigation.navigate('Common', {screen: 'commingsoon'});
+        navigation.navigate('Common', {screen: 'commingSoon'});
         break;
       }
     }

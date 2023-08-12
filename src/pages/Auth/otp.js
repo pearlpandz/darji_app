@@ -32,6 +32,31 @@ function OtpValidation({route, navigation}) {
   const {setAuthStatus} = useContext(AuthContext);
   const [confirm, setConfirm] = useState(null);
 
+  const isExisting = async () => {
+    try {
+      const url = `${HOST}/api/isExisting`;
+      const _payload = {
+        email: payload.email,
+        mobile_number: mobile,
+      };
+      const data = await axios.post(url, _payload);
+      if (data.isExisting) {
+        registerUser();
+      }
+    } catch (error) {
+      const msg = error?.response?.data
+        ? Object.values(error.response.data.error)
+            .map(a => a.toString())
+            .join(', ')
+        : 'Something went wrong!';
+      if (Platform.OS === 'android') {
+        Alert.alert('Warning', msg);
+      } else {
+        AlertIOS.alert(msg);
+      }
+    }
+  };
+
   const registerUser = async () => {
     try {
       const url = `${HOST}/api/register`;
@@ -79,7 +104,7 @@ function OtpValidation({route, navigation}) {
       const url = `${HOST}/api/verifyMobileNumber`;
       const _payload = {mobile_number: mobile, otp: enteredOtp};
       const {data} = await axios.put(url, _payload);
-      console.log(data);
+      await AsyncStorage.setItem('token', data.token);
       if (data) {
         console.log('-------------- otp verified -----------------');
         if (type === 'register') {
@@ -209,7 +234,7 @@ function OtpValidation({route, navigation}) {
               width={120}
               disabled={!mobile}
               onPress={() => {
-                registerUser();
+                isExisting();
               }}
             />
           </View>

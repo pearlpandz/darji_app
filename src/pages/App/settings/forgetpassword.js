@@ -22,6 +22,7 @@ import Button from '../../../reusables/button';
 
 import {HOST} from '../../../../env';
 import InputPassword from '../../../reusables/InputPassword';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function ForgetPassword({route, navigation}) {
   const [mobile, setMobileNumber] = useState(false);
@@ -29,6 +30,7 @@ function ForgetPassword({route, navigation}) {
   const [enteredOtp, setEnteredOtp] = useState();
   const [confirm, setConfirm] = useState(null);
   const [showPasswordView, setPasswordView] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const getCookie = name => {
     const value = `; ${document.cookie}`;
@@ -40,16 +42,28 @@ function ForgetPassword({route, navigation}) {
   };
 
   const createPassword = async () => {
+    setSubmitted(true);
     try {
-      const url = `${HOST}/api/createpassword`;
-      const _payload = {
-        password: password,
-      };
-      const {data} = await axios.post(url, _payload, {
-        withCredentials: true,
-      });
-      if (data) {
-        navigation.navigate('authindex');
+      if (password.length > 4) {
+        const url = `${HOST}/api/createpassword`;
+        const _payload = {
+          password: password,
+        };
+        const {data} = await axios.post(url, _payload, {
+          withCredentials: true,
+          headers: {
+            Authorization: await AsyncStorage.getItem('token')
+          }
+        });
+        if (data) {
+          setSubmitted(false);
+          if (Platform.OS === 'android') {
+            Alert.alert('Update Info', 'Successfully password changed!');
+          } else {
+            AlertIOS.alert('Successfully password changed!');
+          }
+          navigation.navigate('authindex');
+        }
       }
     } catch (error) {
       const msg = error?.response?.data
@@ -62,6 +76,7 @@ function ForgetPassword({route, navigation}) {
       } else {
         AlertIOS.alert(msg);
       }
+      setSubmitted(false);
     }
   };
 
@@ -91,7 +106,7 @@ function ForgetPassword({route, navigation}) {
       const url = `${HOST}/api/verifyMobileNumber`;
       const _payload = {mobile_number: mobile, otp: enteredOtp};
       const {data} = await axios.put(url, _payload, {withCredentials: true});
-      console.log(data);
+      await AsyncStorage.setItem('token', data.token);
       if (data) {
         console.log('-------------- otp verified -----------------');
         setPasswordView(true);
@@ -143,12 +158,24 @@ function ForgetPassword({route, navigation}) {
               onChangeText={pass => setPassword(pass)}
             />
           </View>
+          {console.log('submitted', submitted, 'password', password)}
+          {submitted &&
+            (!password ? (
+              <Text style={{color: 'red', paddingTop: 5}}>
+                Please enter your password!
+              </Text>
+            ) : (
+              password.length < 4 && (
+                <Text style={{color: 'red', paddingTop: 5}}>
+                  Password length must be atleast 4 characters
+                </Text>
+              )
+            ))}
           <View style={{marginTop: 10}}>
             {/* <Button label="cancel" type="secondary" onPress={() => navigation.goBack()} /> */}
             <Button
               label="update password"
               type="primary"
-              disabled={!password}
               onPress={() => {
                 createPassword();
               }}

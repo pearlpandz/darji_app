@@ -10,6 +10,9 @@ import {
   Dimensions,
   ScrollView,
   LogBox,
+  Platform,
+  Alert,
+  AlertIOS,
 } from 'react-native';
 import Checkbox from '@react-native-community/checkbox';
 import IonIcons from 'react-native-vector-icons/Ionicons';
@@ -21,6 +24,8 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
+import {HOST} from '../../../env';
+import axios from 'axios';
 
 const ANDROID_CLIENT_ID =
   '280676335640-s4fv6lmjr0tqlb81thts0lnmct5d9ig6.apps.googleusercontent.com';
@@ -30,6 +35,7 @@ LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 function Register({navigation}) {
   const [showPassword, setShowPassword] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [isSelectedTerms, setSelectionTerms] = useState(false);
   const [formdata, setFormdata] = useState({
     name: {value: '', isValid: false},
@@ -50,23 +56,64 @@ function Register({navigation}) {
   const handleChange = (field, value) => {
     const _formdata = {...formdata};
     _formdata[field].value = value;
-    if (value) {
-      _formdata[field].isValid = true;
+
+    if (field === 'password') {
+      if (value.length > 4) {
+        _formdata[field].isValid = true;
+      } else {
+        _formdata[field].isValid = false;
+      }
     } else {
-      _formdata[field].isValid = false;
+      if (value) {
+        _formdata[field].isValid = true;
+      } else {
+        _formdata[field].isValid = false;
+      }
     }
     setFormdata({..._formdata});
   };
 
   const handleSubmit = async () => {
-    const payload = {
-      name: formdata.name.value,
-      password: formdata.password.value,
-      email: formdata.email.value,
-      provider: 'oauth',
-    };
-    navigation.navigate('otp', {payload, type: 'register'});
-    reset();
+    setSubmitted(true);
+    try {
+      if (isFormValid()) {
+        const url = `${HOST}/api/isExisting`;
+        const _payload = {
+          email: formdata.email.value,
+        };
+        const {data} = await axios.post(url, _payload);
+        if (!data.isExisting) {
+          const payload = {
+            name: formdata.name.value,
+            password: formdata.password.value,
+            email: formdata.email.value,
+            provider: 'oauth',
+          };
+          navigation.navigate('otp', {payload, type: 'register'});
+          reset();
+          setSubmitted(false);
+        } else {
+          if (Platform.OS === 'android') {
+            Alert.alert('Exist', 'Email already exist, please try login!');
+          } else {
+            AlertIOS.alert('Exist', 'Email already exist, please try login!');
+          }
+          setSubmitted(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      const msg = error?.response?.data
+        ? Object.values(error.response.data.error)
+            .map(a => a.toString())
+            .join(', ')
+        : 'Something went wrong!';
+      if (Platform.OS === 'android') {
+        Alert.alert('Warning', msg);
+      } else {
+        AlertIOS.alert(msg);
+      }
+    }
   };
 
   const isFormValid = () => {
@@ -116,7 +163,7 @@ function Register({navigation}) {
           {/* Register */}
           <View style={{marginTop: 10}}>
             {/* Full Name */}
-            <View style={[styles.inputContainer, {marginBottom: 15}]}>
+            <View style={[styles.inputContainer, {marginBottom: 5}]}>
               <IonIcons
                 style={styles.inputInsideIcon}
                 name="person-outline"
@@ -133,9 +180,14 @@ function Register({navigation}) {
                 underlineColorAndroid="transparent"
               />
             </View>
+            {submitted && !formdata.name.value && (
+              <Text style={{color: 'red', marginBottom: 15}}>
+                Please enter your name!
+              </Text>
+            )}
 
             {/* Email */}
-            <View style={[styles.inputContainer, {marginBottom: 15}]}>
+            <View style={[styles.inputContainer, {marginBottom: 5}]}>
               <IonIcons
                 style={styles.inputInsideIcon}
                 name="mail-outline"
@@ -153,6 +205,11 @@ function Register({navigation}) {
                 underlineColorAndroid="transparent"
               />
             </View>
+            {submitted && !formdata.email.value && (
+              <Text style={{color: 'red', marginBottom: 15}}>
+                Please enter your email!
+              </Text>
+            )}
 
             {/* Password */}
             <View style={styles.inputContainer}>
@@ -181,6 +238,22 @@ function Register({navigation}) {
                 />
               </TouchableOpacity>
             </View>
+            {console.log(
+              'formdata.password.value',
+              formdata.password.value.length,
+            )}
+            {submitted &&
+              (!formdata.password.value ? (
+                <Text style={{color: 'red', paddingTop: 5}}>
+                  Please enter your password!
+                </Text>
+              ) : (
+                formdata.password.value.length < 4 && (
+                  <Text style={{color: 'red', paddingTop: 5}}>
+                    Password length must be atleast 4 characters
+                  </Text>
+                )
+              ))}
 
             <View style={[styles.checkboxContainer, {marginBottom: 0}]}>
               <Checkbox
@@ -195,12 +268,7 @@ function Register({navigation}) {
             </View>
           </View>
           <View style={{marginTop: 15}}>
-            <Button
-              label="sign up"
-              type="primary"
-              onPress={handleSubmit}
-              disabled={!isFormValid()}
-            />
+            <Button label="sign up" type="primary" onPress={handleSubmit} />
           </View>
 
           {/* separator */}

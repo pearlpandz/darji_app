@@ -7,8 +7,8 @@ export const WelcomeContext = createContext();
 export const CurrentUserContext = createContext();
 
 const initialNetworkStatus = {
-    isOnline: false, 
-    setNetworkStatus: (status) => {}
-}
+  isOnline: false,
+  setNetworkStatus: status => {},
+};
 
 export const NetworkContext = createContext(initialNetworkStatus);

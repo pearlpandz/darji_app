@@ -52,8 +52,6 @@ import ShirtCustomization from './src/pages/App/home/DesginByMyself/customizatio
 import PantCustomization from './src/pages/App/home/DesginByMyself/customization/pant';
 import {Image, Pressable, Text, View} from 'react-native';
 import ReturnPage from './src/pages/App/return';
-
-import AVATAR from './src/assets/images/avatar.png';
 import LOGO from './src/assets/logo-1.png';
 import {NetworkCheck} from './src/HOC/network';
 import store from './src/redux/store';
@@ -61,10 +59,14 @@ import {Provider} from 'react-redux';
 import SelectMeasurement from './src/pages/App/home/selectMeasurement';
 import CommingSoon from './src/pages/Auth/comingsoon';
 import SetPassword from './src/pages/App/settings/setpassword';
+import ViewProfile from './src/pages/App/settings/viewprofile';
+import EditProfile from './src/pages/App/settings/editprofile';
+import DrawerContentComp from './src/reusables/drawercontent';
 
 const Drawer = createDrawerNavigator();
 const DrawerScreen = () => {
   const {setAuthStatus} = useContext(AuthContext);
+
   return (
     <Drawer.Navigator
       initialRouteName="indexDrawer"
@@ -86,34 +88,14 @@ const DrawerScreen = () => {
               justifyContent: 'space-between',
             }}>
             <View>
-              <View
-                style={{
-                  backgroundColor: '#87BCBF',
-                  padding: 20,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  source={AVATAR}
-                  style={{width: 60, height: 60, resizeMode: 'contain'}}
-                />
-                <View style={{marginLeft: 10}}>
-                  <Text
-                    style={{color: '#fff', fontWeight: '600', fontSize: 16}}>
-                    Sandeep Siddamsetty
-                  </Text>
-                  <Text style={{color: '#fff', fontWeight: '300'}}>
-                    Hyderabad
-                  </Text>
-                </View>
-              </View>
+              <DrawerContentComp />
               <DrawerItemList {...props} />
             </View>
             <View style={{padding: 20}}>
               <Pressable
                 onPress={async () => {
                   setAuthStatus(false);
-                  await AsyncStorage.setItem('isAuthenticated', String(false));
+                  await AsyncStorage.clear();
                 }}
                 style={{
                   borderWidth: 1,
@@ -144,6 +126,28 @@ const DrawerScreen = () => {
         }}
       />
       <Drawer.Screen
+        name="profile"
+        component={Profile}
+        options={{
+          drawerLabel: 'Profile',
+          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
+          drawerIcon: ({focused, size}) => (
+            <Ionicons name="person-outline" size={size} color="#87BCBF" />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="orders"
+        component={() => <Text>My Orders</Text>}
+        options={{
+          drawerLabel: 'orders',
+          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
+          drawerIcon: ({focused, size}) => (
+            <Ionicons name="cart-outline" size={size} color="#87BCBF" />
+          ),
+        }}
+      />
+      <Drawer.Screen
         name="return"
         component={ReturnPage}
         options={{
@@ -154,28 +158,6 @@ const DrawerScreen = () => {
           ),
         }}
       />
-      {/* <Drawer.Screen
-      name="settings"
-      component={ReturnPage}
-      options={{
-        drawerLabel: 'settings',
-        drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
-        drawerIcon: ({ focused, size }) => (
-          <Ionicons name="settings-outline" size={size} color="#87BCBF" />
-        )
-      }}
-    />
-    <Drawer.Screen
-      name="notification"
-      component={ReturnPage}
-      options={{
-        drawerLabel: 'notification',
-        drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
-        drawerIcon: ({ focused, size }) => (
-          <Ionicons name="notifications-outline" size={size} color="#87BCBF" />
-        )
-      }}
-    /> */}
       <Drawer.Screen
         name="help"
         component={ReturnPage}
@@ -270,19 +252,6 @@ const AuthStackScreen = () => (
       options={{
         headerShown: true,
         title: 'OTP Verification',
-        headerTitleAlign: 'center',
-        headerTitleStyle: {
-          fontSize: 16,
-          fontWeight: 'bold',
-        },
-      }}
-    />
-    <AuthStack.Screen
-      name="changepassword"
-      component={ChangePassword}
-      options={{
-        headerShown: true,
-        title: 'Change Password',
         headerTitleAlign: 'center',
         headerTitleStyle: {
           fontSize: 16,
@@ -410,10 +379,30 @@ const CommonStack = createNativeStackNavigator();
 const CommonStackScreen = () => (
   <CommonStack.Navigator screenOptions={{headerShown: false}}>
     <CommonStack.Screen
-      name="myprofile"
-      component={Profile}
+      name="viewprofile"
+      component={ViewProfile}
       options={{
         headerShown: false,
+      }}
+    />
+    <CommonStack.Screen
+      name="editprofile"
+      component={EditProfile}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <CommonStack.Screen
+      name="changepassword"
+      component={ChangePassword}
+      options={{
+        headerShown: true,
+        title: 'Change Password',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontSize: 16,
+          fontWeight: 'bold',
+        },
       }}
     />
     <CommonStack.Screen

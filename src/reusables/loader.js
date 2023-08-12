@@ -1,17 +1,26 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View, Text, Dimensions } from 'react-native';
-import { useSelector } from 'react-redux';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+} from 'react-native';
+import {useSelector} from 'react-redux';
 
-const Loader = ({ msg }) => {
+const Loader = ({msg}) => {
   const loader = useSelector(state => state.loader);
+  console.log('loader');
   return (
-    loader && <View style={[styles.container, styles.horizontal]}>
-      <View style={styles.contentContainer}>
-        <ActivityIndicator size="large" color="#fff" />
-        <Text style={styles.label}>{msg}</Text>
+    loader && (
+      <View style={[styles.container, styles.horizontal]}>
+        <View style={styles.contentContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.label}>{msg}</Text>
+        </View>
       </View>
-    </View>
-  )
+    )
+  );
 };
 
 const styles = StyleSheet.create({
@@ -23,11 +32,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     zIndex: 10,
     height: Dimensions.get('window').height,
-    width: Dimensions.get('window').width
+    width: Dimensions.get('window').width,
   },
   contentContainer: {
     justifyContent: 'center',
-    flexDirection: 'column'
+    flexDirection: 'column',
   },
   horizontal: {
     flexDirection: 'row',
@@ -35,8 +44,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   label: {
-    color: '#fff'
-  }
+    color: '#fff',
+  },
 });
 
 export default Loader;

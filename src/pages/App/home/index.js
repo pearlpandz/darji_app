@@ -1,8 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useContext, useEffect} from 'react';
 import {
   SafeAreaView,
-  StatusBar,
   Text,
   View,
   StyleSheet,
@@ -11,16 +10,40 @@ import {
   Image,
   TextInput,
   Pressable,
-  TouchableHighlight,
 } from 'react-native';
-import Navigation from '../../../reusables/navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MEN_IMAGE from './../../../assets/images/men.png';
 import WOMEN_IMAGE from './../../../assets/images/women.jpg';
-import AVATAR from './../../../assets/images/avatar.png';
 import GET_A_QUOTE from './../../../assets/images/getquote.png';
+import {HOST} from '../../../../env';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {CurrentUserContext} from '../../../services/context';
 
 function HomePage({navigation}) {
+  const {setSession} = useContext(CurrentUserContext);
+
+  const getUserData = async () => {
+    try {
+      const url = `${HOST}/api/profile`;
+      const {data} = await axios.get(url, {
+        headers: {
+          Authorization: await AsyncStorage.getItem('token'),
+        },
+      });
+      if (data) {
+        setSession(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#f7f7f7'}}>
       <ScrollView style={{flex: 1}}>
@@ -210,7 +233,6 @@ const styles = StyleSheet.create({
     marginRight: 20,
     justifyContent: 'space-between',
     backgroundColor: '#ffffff',
-    borderRadius: 6,
     overflow: 'hidden',
   },
   cardDetails: {
