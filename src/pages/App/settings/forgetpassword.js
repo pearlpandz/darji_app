@@ -52,8 +52,8 @@ function ForgetPassword({route, navigation}) {
         const {data} = await axios.post(url, _payload, {
           withCredentials: true,
           headers: {
-            Authorization: await AsyncStorage.getItem('token')
-          }
+            Authorization: await AsyncStorage.getItem('token'),
+          },
         });
         if (data) {
           setSubmitted(false);
@@ -105,7 +105,12 @@ function ForgetPassword({route, navigation}) {
       console.log('-------------- otp verified -----------------');
       const url = `${HOST}/api/verifyMobileNumber`;
       const _payload = {mobile_number: mobile, otp: enteredOtp};
-      const {data} = await axios.put(url, _payload, {withCredentials: true});
+      const {data} = await axios.put(url, _payload, {
+        withCredentials: true,
+        headers: {
+          Authorization: await AsyncStorage.getItem('token'),
+        },
+      });
       await AsyncStorage.setItem('token', data.token);
       if (data) {
         console.log('-------------- otp verified -----------------');

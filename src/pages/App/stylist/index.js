@@ -127,7 +127,6 @@ const styles = StyleSheet.create({
         height: 120,
         flex: 1,
         width: '100%',
-        color: '#75bbb9'
     },
     horizontalAlign: {
         flexDirection: 'row',

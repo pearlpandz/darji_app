@@ -37,6 +37,7 @@ import {setLoader} from '../../../redux/slices/loader';
 import {HOST} from '../../../../env';
 import MEN_IMAGE from './../../../assets/images/men.png';
 import {AuthContext} from '../../../services/context';
+import {updateOrder} from '../../../redux/slices/order';
 
 function CartPage({navigation}) {
   const dispatch = useDispatch();
@@ -72,7 +73,7 @@ function CartPage({navigation}) {
   const [actionSheet, setActionSheet] = useState(false);
   const [orders, setOrders] = useState([]);
   const [orderId, setOrderid] = useState();
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(true);
 
   const ActionSheetModal = useMemo(
     () => (
@@ -96,7 +97,16 @@ function CartPage({navigation}) {
   );
 
   const redirectTo = (item, status) => {
-    console.log(item[status]);
+    console.log('redirectTo', item, status);
+    dispatch(updateOrder(item));
+    navigation.navigate('Common', {
+      screen: 'vieworder',
+      params: {
+        id: item.id,
+        data: item,
+        statu: status,
+      },
+    });
   };
 
   const resultView = useMemo(() => {
@@ -212,6 +222,10 @@ function CartPage({navigation}) {
   }, [selectedType, orderId, orders]);
 
   const getOrders = useCallback(async () => {
+    if (!refreshing) {
+      return;
+    }
+
     try {
       dispatch(setLoader(true));
       const url = `${HOST}/api/orders`;
@@ -224,7 +238,7 @@ function CartPage({navigation}) {
         },
       });
       if (data) {
-        console.log(data);
+        console.log('data', data);
         setOrders(data);
         setRefreshing(false);
         dispatch(setLoader(false));
@@ -360,7 +374,6 @@ const styles = StyleSheet.create({
     height: 120,
     flex: 1,
     width: '100%',
-    color: '#75bbb9',
   },
   horizontalAlign: {
     flexDirection: 'row',

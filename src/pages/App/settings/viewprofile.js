@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -22,6 +22,16 @@ import {AuthContext} from '../../../services/context';
 
 function ViewProfile({navigation}) {
   const {setAuthStatus} = useContext(AuthContext);
+  const [userinfo, setUserInfo] = useState({});
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const _userinfo = JSON.parse(await AsyncStorage.getItem('userinfo'));
+      setUserInfo(_userinfo);
+    };
+
+    getUserInfo();
+  }, []);
 
   return (
     <SafeAreaView
@@ -61,9 +71,10 @@ function ViewProfile({navigation}) {
                 borderRadius: 50,
                 width: 100,
                 height: 100,
+                overflow: 'hidden',
               }}>
               <Image
-                source={AVATAR}
+                source={userinfo?.profilePic || AVATAR}
                 style={{
                   resizeMode: 'contain',
                   width: '100%',
@@ -102,19 +113,23 @@ function ViewProfile({navigation}) {
             }}>
             <View style={styles.info}>
               <Text style={styles.title}>Name</Text>
-              <Text>Muthupandi Velmurugan</Text>
+              <Text style={{textTransform: 'capitalize'}}>
+                {userinfo?.name}
+              </Text>
             </View>
             <View style={styles.info}>
               <Text style={styles.title}>Email</Text>
-              <Text>pearlpandzz@gmail.com</Text>
+              <Text>{userinfo?.email}</Text>
             </View>
             <View style={styles.info}>
               <Text style={styles.title}>Mobile Number</Text>
-              <Text>8610100498</Text>
+              <Text>{userinfo?.mobile_number}</Text>
             </View>
             <View style={styles.info}>
               <Text style={styles.title}>Gender</Text>
-              <Text>Male</Text>
+              <Text style={{textTransform: 'capitalize'}}>
+                {userinfo?.gender}
+              </Text>
             </View>
           </View>
         </View>

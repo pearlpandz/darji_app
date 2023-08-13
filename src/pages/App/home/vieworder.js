@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,6 @@ import {
   StyleSheet,
   Image,
   Dimensions,
-  TextInput,
-  Platform,
-  Alert,
-  AlertIOS,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Shirt from '../../../reusables/customization/shirt';
@@ -19,137 +15,44 @@ import AttributeView from './attributeView';
 import Button from '../../../reusables/button';
 
 import Cloth from './../../../assets/images/cloth.jpg';
-import axios from 'axios';
-import {HOST} from '../../../../env';
-import {updateOrder, resetOrder} from '../../../redux/slices/order';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import MyPant from '../../../reusables/customization/mypant';
-import {setLoader} from '../../../redux/slices/loader';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from '../../../services/context';
+import {HOST} from '../../../../env';
 
-function Summary({navigation}) {
-  const dispatch = useDispatch();
-  const {setAuthStatus} = useContext(AuthContext);
+function ViewOrder({navigation}) {
   const orders = useSelector(state => state.orders);
   const {
     orderType,
     measurements,
     cloth_length,
     cloth_total_price,
+    cloth,
     measurementAddress,
     cloth_pickuplocation,
     cloth_couriered,
     reference,
-    cloth,
+    deliveryAddress,
+    orderDeliveryDate,
+    orderDeliveryStatus,
+    totalPrice,
+    alreadyPaid,
+    orderStatus,
   } = orders;
   const config = {...measurements};
   const selectedCloth = {
+    ...cloth,
     size: cloth_length,
     price: cloth_total_price,
-    ...cloth,
   };
 
-  const [address, setAddress] = useState('');
+  const handleContinue = () => {
+    console.log(
+      'should analyse the response and redirect to the specific page',
+    );
+  };
 
-  const updateDeliveryAddress = async isDraft => {
-    try {
-      dispatch(setLoader(true));
-      const payload = {
-        deliveryAddress: address,
-        orderStatus: 'draft',
-        orderDeliveryStatus: 'pending',
-        orderPaymentStatus: 'pending',
-      };
-      dispatch(updateOrder(payload));
-
-      const url = `${HOST}/api/order`;
-      const _orders = {...orders};
-      const id = _orders.cloth.id;
-      delete _orders.cloth;
-      const _payload1 = {
-        ..._orders,
-        cloth: id,
-        deliveryAddress: address,
-        orderStatus: 'draft',
-        orderDeliveryStatus: 'pending',
-        orderPaymentStatus: 'pending',
-      };
-      delete _payload1.reference;
-
-      const response = await axios.post(url, _payload1, {
-        withCredentials: true,
-        headers: {
-          Authorization: await AsyncStorage.getItem('token'),
-        },
-      });
-      console.log('response', response);
-      const {data} = response;
-      if (data) {
-        console.log('order created', data.id);
-
-        if (reference?.length > 0) {
-          const formdata = new FormData();
-          await Promise.all(
-            orders.reference.map(item => {
-              console.log('reference', item);
-              formdata.append('reference', {
-                uri: item.uri,
-                type: item.type,
-                name: item.fileName,
-              });
-            }),
-          );
-          const url1 = `${HOST}/api/orderReferenceImage/${data.id}`;
-          await axios.post(url1, formdata, {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: await AsyncStorage.getItem('token'),
-            },
-          });
-        }
-        console.log('order saved in draft');
-        dispatch(setLoader(false));
-
-        if (!isDraft) {
-          navigation.navigate('finalquote', {orderId: data.id});
-        } else {
-          dispatch(resetOrder());
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'cart',
-              },
-            ],
-          });
-          navigation.navigate('cart');
-        }
-      }
-    } catch (error) {
-      dispatch(setLoader(false));
-      console.error(error);
-      const status_code = error.response.status;
-      if (status_code === 403 || status_code === 401) {
-        setAuthStatus(false);
-        if (Platform.OS === 'android') {
-          Alert.alert('Warning', 'Session Expired!');
-        } else {
-          AlertIOS.alert('Session Expired!');
-        }
-      } else {
-        const msg =
-          Object.values(error.response.data)
-            .map(a => a.toString())
-            .join(', ') || 'Something went wrong!';
-        if (Platform.OS === 'android') {
-          Alert.alert('Warning', msg);
-        } else {
-          AlertIOS.alert(msg);
-        }
-      }
-    }
+  const handleCancelOrder = () => {
+    console.log('cancel the order by id');
   };
 
   return (
@@ -166,7 +69,7 @@ function Summary({navigation}) {
               onPress={() => navigation.goBack()}
             />
             <Text style={{color: '#fff', fontSize: 16, fontWeight: '500'}}>
-              Summary
+              View Order
             </Text>
           </View>
         </View>
@@ -247,23 +150,6 @@ function Summary({navigation}) {
             )
           ) : (
             <View>
-              <View
-                style={{
-                  marginVertical: 5,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={10}
-                  style={{marginRight: 5}}
-                  color="red"
-                />
-                <Text style={{fontSize: 10}}>
-                  No measurements provide, it will collect from the customer
-                  provided location
-                </Text>
-              </View>
               <Text
                 style={{
                   fontWeight: '600',
@@ -297,8 +183,8 @@ function Summary({navigation}) {
                     height: 100,
                   }}>
                   <Image
-                    src={img.uri}
-                    alt={img.fileName}
+                    src={`${HOST}/media/${img.url}`}
+                    alt={String(img.id)}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -311,7 +197,7 @@ function Summary({navigation}) {
         )}
 
         {/* cloth realted content Visualization */}
-        <View style={[styles.titleCard]}>
+        <View style={styles.titleCard}>
           {selectedCloth.name ? (
             <>
               <View style={styles.iconContainer}>
@@ -347,23 +233,6 @@ function Summary({navigation}) {
             </View>
           ) : (
             <View>
-              <View
-                style={{
-                  marginBottom: 5,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={10}
-                  style={{marginRight: 5}}
-                  color="#fff"
-                />
-                <Text style={{fontSize: 10, color: '#fff'}}>
-                  No cloth selected, it will collect from the customer provided
-                  location
-                </Text>
-              </View>
               <Text
                 style={{
                   color: '#fff',
@@ -377,47 +246,90 @@ function Summary({navigation}) {
           )}
         </View>
 
-        <View style={[styles.addressSection, {paddingBottom: 0}]}>
-          <Text style={styles.subtitle}>Delivery Address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="H. No, Street, City, State, Pincode"
-            multiline
-            numberOfLines={7}
-            value={address}
-            onChangeText={_address => {
-              setAddress(_address);
-            }}
-            underlineColorAndroid="transparent"
-            textAlignVertical="top"
-          />
-        </View>
+        {/* order delivery details */}
+        {orderStatus !== 'draft' && (
+          <View style={[styles.references, {backgroundColor: '#f3f3f3'}]}>
+            <Text style={styles.title}>Delivery Details</Text>
+            <View style={{marginBottom: 20}}>
+              <Text style={styles.subtitle}>Address</Text>
+              <Text>{deliveryAddress}</Text>
+            </View>
+            <View style={{marginBottom: 20}}>
+              <Text style={styles.subtitle}>Date of Delivery</Text>
+              <Text>{orderDeliveryDate || 'Yet to decided'}</Text>
+            </View>
+            <View style={{marginBottom: 20}}>
+              <Text style={styles.subtitle}>Status</Text>
+              <Text>{orderDeliveryStatus}</Text>
+            </View>
+          </View>
+        )}
 
-        <View
-          style={[
-            styles.addressSection,
-            {
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
-              paddingTop: 0,
-            },
-          ]}>
-          <Button
-            type="primaryoutline"
-            label="save for later"
-            width={(Dimensions.get('window').width - 50) / 2}
-            disabled={!address}
-            onPress={() => updateDeliveryAddress(true)}
-          />
-          <Button
-            type="primary"
-            label="continue to checkout"
-            width={(Dimensions.get('window').width - 50) / 2}
-            disabled={!address}
-            onPress={() => updateDeliveryAddress()}
-          />
-        </View>
+        {/* Payment details */}
+        {orderStatus !== 'draft' && (
+          <View style={[styles.references]}>
+            <Text style={styles.title}>Payment Details</Text>
+            <View
+              style={[
+                styles.detailContainer,
+                {marginTop: 0, borderRadius: 10},
+              ]}>
+              <View style={styles.row}>
+                <Text style={styles.label}>Stitching Price</Text>
+                <Text style={styles.value}>1000</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Fabric Charges</Text>
+                <Text style={styles.value}>100</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Customisation Cost</Text>
+                <Text style={styles.value}>00</Text>
+              </View>
+              <View style={[styles.hr, styles.row]} />
+              <View style={styles.row}>
+                <Text style={styles.label}>Total</Text>
+                <Text style={[styles.value, styles.active]}>{totalPrice}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Already Paid</Text>
+                <Text style={[styles.value, styles.active]}>{alreadyPaid}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Remaining</Text>
+                <Text style={[styles.value, styles.active]}>
+                  {totalPrice - alreadyPaid}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {orderStatus === 'draft' && (
+          <View
+            style={[
+              styles.addressSection,
+              {
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                paddingTop: 10,
+              },
+            ]}>
+            <Button
+              type="primaryoutline"
+              label="update order"
+              width={(Dimensions.get('window').width - 50) / 2}
+              onPress={() => handleCancelOrder()}
+            />
+            <Button
+              type="primary"
+              label="continue"
+              width={(Dimensions.get('window').width - 50) / 2}
+              onPress={() => handleContinue()}
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -455,15 +367,6 @@ const styles = StyleSheet.create({
     marginRight: 20,
     textTransform: 'capitalize',
   },
-  label: {
-    color: '#7D8184',
-    textTransform: 'capitalize',
-  },
-  value: {
-    color: '#324755',
-    textTransform: 'capitalize',
-    fontWeight: '500',
-  },
   titleCard: {
     backgroundColor: '#334856',
     padding: 20,
@@ -482,11 +385,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     textTransform: 'capitalize',
-  },
-  hr: {
-    height: 1,
-    width: 50,
-    backgroundColor: '#fff',
   },
   price: {
     color: '#fff',
@@ -510,6 +408,30 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginBottom: 10,
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  label: {
+    color: '#7D8184',
+    textTransform: 'capitalize',
+    fontSize: 16,
+  },
+  value: {
+    color: '#324755',
+    fontWeight: '500',
+    fontSize: 18,
+    textTransform: 'capitalize',
+  },
+  active: {
+    color: '#E8875C',
+  },
+  hr: {
+    height: 1,
+    width: '100%',
+    backgroundColor: '#d0d0d0',
+  },
 });
 
-export default Summary;
+export default ViewOrder;

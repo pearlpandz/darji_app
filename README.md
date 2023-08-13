@@ -49,4 +49,21 @@ Issues
 - [x] Design my self / collar and other custimzation options are not changing in reference image
 - [x] My profile is not working from menu button / Conent in my profile ( Name ,Adress(editable) , Mobile number (Editable ),Orders )
 - [ ] Items that addeded in cart is not editable 
-- [ ] Sidebar profile information is not showing properly
+  - [x] view order
+    - [x] Copy Summary page and show the details except continue order. 
+    - [x] Add button 1 ['continue']
+    - [x] Add button 2 as text ['cancel order']
+  - [ ] modify order details
+    - [ ] Add edit icon in all the sections, 
+    - [ ] when user click that redirect to that specific page or open modal. 
+    - [ ] Once that activity done that should come back view order page but don't call the api. once they click update order then only it will save. but meanwhile all the changes will available in redux
+  - [ ] cancel order (payment return and cancellation charge and that flow will go....)
+  - [ ] Move images to s3 bucket in django
+
+
+
+
+Reference Image
+Measurements
+Cloth
+Delivery address

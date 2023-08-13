@@ -27,7 +27,7 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
-import {AuthContext, CurrentUserContext} from '../../services/context';
+import {AuthContext} from '../../services/context';
 import axios from 'axios';
 import {HOST} from '../../../env';
 import {useDispatch} from 'react-redux';
@@ -46,7 +46,6 @@ LogBox.ignoreLogs(['new NativeEventEmitter']);
 
 function Login({navigation}) {
   const dispatch = useDispatch();
-  const {setSession} = useContext(CurrentUserContext);
   const [showPassword, setShowPassword] = useState(false);
   const {setAuthStatus} = useContext(AuthContext);
   const [formdata, setFormdata] = useState({
@@ -72,12 +71,12 @@ function Login({navigation}) {
       console.log('--------------social login------------');
       const {data} = await axios.post(url, payload);
       if (data) {
-        dispatch(setLoader(false));
-        setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
         await AsyncStorage.setItem('token', data.token);
-        dispatch(setSession(data.userinfo));
+        await AsyncStorage.setItem('userinfo', JSON.stringify(data.userinfo));
         ToastAndroid.show('Successfully Loggedin!', ToastAndroid.SHORT);
+        dispatch(setLoader(false));
+        setAuthStatus(true);
       }
     } catch (error) {
       dispatch(setLoader(false));
@@ -138,12 +137,12 @@ function Login({navigation}) {
       const {data} = await axios.post(url, payload);
       if (data) {
         console.log('user info:', data);
-        dispatch(setLoader(false));
-        setAuthStatus(true);
         await AsyncStorage.setItem('isAuthenticated', String(true));
         await AsyncStorage.setItem('token', data.token);
-        dispatch(setSession(data.userinfo));
+        await AsyncStorage.setItem('userinfo', JSON.stringify(data.userinfo));
         ToastAndroid.show('Successfully LoggedIn!', ToastAndroid.SHORT);
+        dispatch(setLoader(false));
+        setAuthStatus(true);
       }
     } catch (error) {
       dispatch(setLoader(false));

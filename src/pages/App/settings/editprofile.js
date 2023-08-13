@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -27,7 +27,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../../reusables/loader';
 import {useDispatch} from 'react-redux';
 import {setLoader} from '../../../redux/slices/loader';
-import {CurrentUserContext} from '../../../services/context';
 
 const ACTIONITEMS = [
   {
@@ -46,9 +45,9 @@ const ACTIONITEMS = [
 
 function EditProfile({navigation}) {
   const dispatch = useDispatch();
-  const {setSession} = useContext(CurrentUserContext);
   const [submitted, setSubmitted] = useState(false);
   const [actionSheet, setActionSheet] = useState(false);
+  const [profilePic, setProfilePic] = useState();
   const [formdata, setFormdata] = useState({
     name: {value: '', isValid: false},
     email: {value: '', isValid: false},
@@ -133,13 +132,14 @@ function EditProfile({navigation}) {
           },
         });
         if (data) {
-          setSession(data);
+          await AsyncStorage.setItem('userinfo', JSON.stringify(data));
           setSubmitted(false);
           if (Platform.OS === 'android') {
             Alert.alert('Update Info', 'Successfully updated!');
           } else {
             AlertIOS.alert('Successfully updated!');
           }
+          reset();
         }
         dispatch(setLoader(false));
       }
@@ -178,6 +178,7 @@ function EditProfile({navigation}) {
           },
           gender: {value: data.gender, isValid: data.gender ? true : false},
         });
+        setProfilePic(data.profilePic);
         setTimeout(() => {
           dispatch(setLoader(false));
         }, 1000);
@@ -244,9 +245,10 @@ function EditProfile({navigation}) {
                 borderRadius: 50,
                 width: 100,
                 height: 100,
+                overflow: 'hidden',
               }}>
               <Image
-                source={AVATAR}
+                source={profilePic || AVATAR}
                 style={{
                   resizeMode: 'contain',
                   width: '100%',

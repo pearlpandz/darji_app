@@ -62,6 +62,7 @@ import SetPassword from './src/pages/App/settings/setpassword';
 import ViewProfile from './src/pages/App/settings/viewprofile';
 import EditProfile from './src/pages/App/settings/editprofile';
 import DrawerContentComp from './src/reusables/drawercontent';
+import ViewOrder from './src/pages/App/home/vieworder';
 
 const Drawer = createDrawerNavigator();
 const DrawerScreen = () => {
@@ -138,8 +139,15 @@ const DrawerScreen = () => {
       />
       <Drawer.Screen
         name="orders"
-        component={() => <Text>My Orders</Text>}
+        component={CartPage}
         options={{
+          headerShown: true,
+          title: 'My Orders',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+          },
           drawerLabel: 'orders',
           drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
           drawerIcon: ({focused, size}) => (
@@ -450,6 +458,13 @@ const CommonStackScreen = () => (
       component={Summary}
       options={() => ({
         title: 'Summary',
+        headerShown: false,
+      })}
+    />
+    <CommonStack.Screen
+      name="vieworder"
+      component={ViewOrder}
+      options={({route}) => ({
         headerShown: false,
       })}
     />

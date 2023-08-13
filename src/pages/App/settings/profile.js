@@ -1,19 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   ScrollView,
   SafeAreaView,
-  Dimensions,
   Pressable,
   Image,
 } from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../../../reusables/button';
 import BG from './../../../assets/profile-bg.webp';
 import AVATAR from './../../../assets/images/avatar.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -21,6 +18,16 @@ import {AuthContext} from '../../../services/context';
 
 function Profile({navigation}) {
   const {setAuthStatus} = useContext(AuthContext);
+  const [userinfo, setUserInfo] = useState({});
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const _userinfo = JSON.parse(await AsyncStorage.getItem('userinfo'));
+      setUserInfo(_userinfo);
+    };
+
+    getUserInfo();
+  }, []);
 
   return (
     <SafeAreaView
@@ -60,9 +67,10 @@ function Profile({navigation}) {
                 borderRadius: 50,
                 width: 100,
                 height: 100,
+                overflow: 'hidden',
               }}>
               <Image
-                source={AVATAR}
+                source={userinfo?.profilePic || AVATAR}
                 style={{
                   resizeMode: 'contain',
                   width: '100%',
@@ -77,7 +85,7 @@ function Profile({navigation}) {
                 color: '#000',
                 marginTop: 10,
               }}>
-              Muthupandi Velmurugan
+              {userinfo?.name}
             </Text>
             <TouchableOpacity
               onPress={() => {

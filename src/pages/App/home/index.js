@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {
   SafeAreaView,
   Text,
@@ -18,11 +18,11 @@ import GET_A_QUOTE from './../../../assets/images/getquote.png';
 import {HOST} from '../../../../env';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {CurrentUserContext} from '../../../services/context';
+import {useDispatch} from 'react-redux';
+import {resetOrder} from '../../../redux/slices/order';
 
 function HomePage({navigation}) {
-  const {setSession} = useContext(CurrentUserContext);
-
+  const dispatch = useDispatch();
   const getUserData = async () => {
     try {
       const url = `${HOST}/api/profile`;
@@ -32,7 +32,7 @@ function HomePage({navigation}) {
         },
       });
       if (data) {
-        setSession(data);
+        await AsyncStorage.setItem('userinfo', JSON.stringify(data));
       }
     } catch (error) {
       console.log(error);
@@ -41,7 +41,6 @@ function HomePage({navigation}) {
 
   useEffect(() => {
     getUserData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -72,13 +71,14 @@ function HomePage({navigation}) {
           <Text style={styles.sectionTitle}>popular near you</Text>
           <View style={styles.cards}>
             <Pressable
-              onPress={() =>
+              onPress={() => {
+                dispatch(resetOrder());
                 navigation.navigate('selectdesign', {
                   title: 'Men',
                   gender: 'male',
                   uri: MEN_IMAGE,
-                })
-              }>
+                });
+              }}>
               <View style={[styles.card, styles.boxWithShadow]}>
                 <Image source={MEN_IMAGE} style={styles.cardImage} />
                 <View style={styles.cardDetails}>
@@ -105,9 +105,10 @@ function HomePage({navigation}) {
               </View>
             </Pressable>
             <Pressable
-              onPress={() =>
-                navigation.navigate('Common', {screen: 'commingSoon'})
-              }>
+              onPress={() => {
+                dispatch(resetOrder());
+                navigation.navigate('Common', {screen: 'commingSoon'});
+              }}>
               <View
                 style={[styles.card, styles.boxWithShadow, {marginRight: 0}]}>
                 <Image source={WOMEN_IMAGE} style={styles.cardImage} />
@@ -265,7 +266,6 @@ const styles = StyleSheet.create({
     height: 120,
     flex: 1,
     width: '100%',
-    color: '#75bbb9',
   },
   horizontalAlign: {
     flexDirection: 'row',
