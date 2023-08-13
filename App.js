@@ -96,7 +96,9 @@ const DrawerScreen = () => {
               <Pressable
                 onPress={async () => {
                   setAuthStatus(false);
-                  await AsyncStorage.clear();
+                  await AsyncStorage.removeItem('userinfo');
+                  await AsyncStorage.removeItem('token');
+                  await AsyncStorage.removeItem('isAuthenticated');
                 }}
                 style={{
                   borderWidth: 1,

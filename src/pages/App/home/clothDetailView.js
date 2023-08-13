@@ -30,6 +30,8 @@ function ClothDetail({route, navigation}) {
         cloth_length: selectedQuantity,
         cloth_total_price: Number(selectedQuantity) * Number(pricePermeter),
         cloth: {id, name, image, pricePermeter},
+        cloth_couriered: false,
+        cloth_pickuplocation: '',
       };
       dispatch(updateOrder(payload));
       navigation.navigate('summary');

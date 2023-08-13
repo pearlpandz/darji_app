@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useState} from 'react';
+import React, {Fragment, useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Platform,
   Alert,
   AlertIOS,
+  Pressable,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Shirt from '../../../reusables/customization/shirt';
@@ -27,6 +28,7 @@ import MyPant from '../../../reusables/customization/mypant';
 import {setLoader} from '../../../redux/slices/loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthContext} from '../../../services/context';
+import MyShirt from '../../../reusables/customization/myshirt';
 
 function Summary({navigation}) {
   const dispatch = useDispatch();
@@ -42,6 +44,8 @@ function Summary({navigation}) {
     cloth_couriered,
     reference,
     cloth,
+    orderedDesign,
+    deliveryAddress,
   } = orders;
   const config = {...measurements};
   const selectedCloth = {
@@ -50,7 +54,115 @@ function Summary({navigation}) {
     ...cloth,
   };
 
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(deliveryAddress || '');
+
+  const createOrder = async (url, _payload1, isDraft) => {
+    const response = await axios.post(url, _payload1, {
+      withCredentials: true,
+      headers: {
+        Authorization: await AsyncStorage.getItem('token'),
+      },
+    });
+    console.log('response', response);
+    const {data} = response;
+    if (data) {
+      console.log('order created', data.id);
+      if (reference?.length > 0) {
+        const formdata = new FormData();
+        await Promise.all(
+          orders.reference
+            .filter(a => !a.id)
+            .map(item => {
+              console.log('reference', item);
+              formdata.append('reference', {
+                uri: item.uri,
+                type: item.type,
+                name: item.fileName,
+              });
+            }),
+        );
+        const url1 = `${HOST}/api/orderReferenceImage/${data.id}`;
+        await axios.post(url1, formdata, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: await AsyncStorage.getItem('token'),
+          },
+        });
+      }
+      console.log('order saved in draft');
+      dispatch(setLoader(false));
+
+      if (!isDraft) {
+        navigation.navigate('finalquote', {orderId: data.id});
+      } else {
+        dispatch(resetOrder());
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'cart',
+            },
+          ],
+        });
+        navigation.navigate('cart');
+      }
+    }
+  };
+
+  const updateOrderDetails = async (url, _payload1, isDraft) => {
+    const response = await axios.put(url, _payload1, {
+      withCredentials: true,
+      headers: {
+        Authorization: await AsyncStorage.getItem('token'),
+      },
+    });
+    console.log('response', response);
+    const {data} = response;
+    if (data) {
+      console.log('order created', data.id);
+      if (reference.filter(a => !a.id)?.length > 0) {
+        const formdata = new FormData();
+        await Promise.all(
+          orders.reference
+            .filter(a => !a.id)
+            .map(item => {
+              console.log('reference', item);
+              formdata.append('reference', {
+                uri: item.uri,
+                type: item.type,
+                name: item.fileName,
+              });
+            }),
+        );
+        const url1 = `${HOST}/api/orderReferenceImage/${data.id}`;
+        await axios.post(url1, formdata, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: await AsyncStorage.getItem('token'),
+          },
+        });
+      }
+      console.log('order saved in draft');
+      dispatch(setLoader(false));
+      console.log('isDraft', !isDraft);
+      if (!isDraft) {
+        navigation.navigate('finalquote', {orderId: data.id});
+      } else {
+        dispatch(resetOrder());
+        navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'cart',
+            },
+          ],
+        });
+        navigation.navigate('cart');
+      }
+    }
+  };
 
   const updateDeliveryAddress = async isDraft => {
     try {
@@ -63,7 +175,6 @@ function Summary({navigation}) {
       };
       dispatch(updateOrder(payload));
 
-      const url = `${HOST}/api/order`;
       const _orders = {...orders};
       const id = _orders.cloth.id;
       delete _orders.cloth;
@@ -77,55 +188,14 @@ function Summary({navigation}) {
       };
       delete _payload1.reference;
 
-      const response = await axios.post(url, _payload1, {
-        withCredentials: true,
-        headers: {
-          Authorization: await AsyncStorage.getItem('token'),
-        },
-      });
-      console.log('response', response);
-      const {data} = response;
-      if (data) {
-        console.log('order created', data.id);
-
-        if (reference?.length > 0) {
-          const formdata = new FormData();
-          await Promise.all(
-            orders.reference.map(item => {
-              console.log('reference', item);
-              formdata.append('reference', {
-                uri: item.uri,
-                type: item.type,
-                name: item.fileName,
-              });
-            }),
-          );
-          const url1 = `${HOST}/api/orderReferenceImage/${data.id}`;
-          await axios.post(url1, formdata, {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: await AsyncStorage.getItem('token'),
-            },
-          });
-        }
-        console.log('order saved in draft');
-        dispatch(setLoader(false));
-
-        if (!isDraft) {
-          navigation.navigate('finalquote', {orderId: data.id});
-        } else {
-          dispatch(resetOrder());
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'cart',
-              },
-            ],
-          });
-          navigation.navigate('cart');
-        }
+      if (orders?.id) {
+        // edit mode
+        const url = `${HOST}/api/updateOrder/${orders.id}`;
+        updateOrderDetails(url, _payload1, isDraft);
+      } else {
+        // add mode
+        const url = `${HOST}/api/order`;
+        createOrder(url, _payload1, isDraft);
       }
     } catch (error) {
       dispatch(setLoader(false));
@@ -171,22 +241,77 @@ function Summary({navigation}) {
           </View>
         </View>
 
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          {orderType === 'shirt' ? (
-            <Shirt config={config} />
-          ) : orderType === 'pant' ? (
-            <MyPant config={config} />
+        {/* Customization */}
+        <View>
+          <View style={[styles.flex, {paddingHorizontal: 20}]}>
+            <Text style={[styles.title]}>customization</Text>
+          </View>
+          {reference.length > 0 ? (
+            // Reference Cloth for customization
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: 10,
+                flex: 1,
+                flexGrow: 1,
+                paddingHorizontal: 20,
+              }}>
+              {reference.map((img, key) => (
+                <View
+                  key={key}
+                  style={{
+                    width: Dimensions.get('screen').width / 3 - 60,
+                    height: 100,
+                  }}>
+                  <Image
+                    src={img.uri || `${HOST}/media/${img.url}`}
+                    alt={img.fileName || String(img.id)}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                    }}
+                  />
+                </View>
+              ))}
+            </View>
           ) : (
-            <></>
+            // Customization by App
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 20,
+              }}>
+              {orderType === 'shirt' ? (
+                <MyShirt
+                  config={{
+                    collor: orderedDesign.collor || '',
+                    pocket: orderedDesign.pocket || '',
+                    sleeve: orderedDesign.sleeve || '',
+                    cuff: orderedDesign.cuff || '',
+                    cuffStyle: orderedDesign.cuffStyle || '',
+                    back: orderedDesign.back || '',
+                    stamp: orderedDesign.stamp || '',
+                  }}
+                />
+              ) : orderType === 'pant' ? (
+                <MyPant config={config} />
+              ) : (
+                <></>
+              )}
+            </View>
           )}
         </View>
 
         {/* Measurements */}
         <View style={styles.detailContainer}>
+          <View style={[styles.flex]}>
+            <Text style={styles.title}>measurements</Text>
+          </View>
           {measurements ? (
             orderType === 'shirt' ? (
-              <>
-                <Text style={styles.title}>give measurements</Text>
+              <Fragment>
                 <View style={styles.measurements}>
                   <View style={styles.measurement}>
                     <AttributeView label="Body Type" value={config.bodyType} />
@@ -213,11 +338,13 @@ function Summary({navigation}) {
 
                 <View>
                   <Text style={styles.label}>Notes / Instructions</Text>
-                  <Text style={styles.value}>{config.notes}</Text>
+                  <Text style={[styles.value, {fontSize: 14}]}>
+                    {config.notes}
+                  </Text>
                 </View>
-              </>
+              </Fragment>
             ) : orderType === 'pant' ? (
-              <>
+              <Fragment>
                 <Text style={styles.title}>give measurements</Text>
                 <View style={styles.measurements}>
                   <View style={styles.measurement}>
@@ -241,34 +368,18 @@ function Summary({navigation}) {
                   <Text style={styles.label}>Notes / Instructions</Text>
                   <Text style={styles.value}>{config.note}</Text>
                 </View>
-              </>
+              </Fragment>
             ) : (
               <></>
             )
           ) : (
             <View>
-              <View
-                style={{
-                  marginVertical: 5,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={10}
-                  style={{marginRight: 5}}
-                  color="red"
-                />
-                <Text style={{fontSize: 10}}>
-                  No measurements provide, it will collect from the customer
-                  provided location
-                </Text>
-              </View>
               <Text
                 style={{
                   fontWeight: '600',
                   textDecorationLine: 'underline',
                   color: '#000',
+                  marginBottom: 5,
                 }}>
                 Measurements will collect from:
               </Text>
@@ -277,104 +388,67 @@ function Summary({navigation}) {
           )}
         </View>
 
-        {/* Reference Image */}
-        {reference.length > 0 && (
-          <View style={[styles.references, {backgroundColor: '#f3f3f3'}]}>
-            <Text style={styles.title}>Reference Images</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                gap: 10,
-                flex: 1,
-                flexGrow: 1,
-              }}>
-              {reference.map((img, key) => (
-                <View
-                  key={key}
-                  style={{
-                    width: Dimensions.get('screen').width / 3 - 60,
-                    height: 100,
-                  }}>
-                  <Image
-                    src={img.uri}
-                    alt={img.fileName}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                    }}
-                  />
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
         {/* cloth realted content Visualization */}
-        <View style={[styles.titleCard]}>
-          {selectedCloth.name ? (
-            <>
-              <View style={styles.iconContainer}>
-                <Image source={Cloth} style={{flex: 1, width: '100%'}} />
-              </View>
+        <View
+          style={{
+            backgroundColor: '#334856',
+            padding: 20,
+          }}>
+          <View style={[styles.flex]}>
+            <Text style={[styles.title, {color: '#fff'}]}>Cloth Details</Text>
+          </View>
+          <View style={[styles.titleCard, {padding: 0}]}>
+            {selectedCloth.name ? (
+              // ---------- Cloth selected from app -------------- //
+              <Fragment>
+                <View style={styles.iconContainer}>
+                  <Image source={Cloth} style={{flex: 1, width: '100%'}} />
+                </View>
+                <View>
+                  <Text style={styles.clothName}>{selectedCloth.name}</Text>
+                  <View style={styles.hr} />
+                  <Text style={styles.price}>
+                    {selectedCloth.size} mtr ................. Rs.
+                    {selectedCloth.price}
+                  </Text>
+                </View>
+              </Fragment>
+            ) : cloth_couriered ? (
+              // -------------- Cloth will courier to office address -------------- //
               <View>
-                <Text style={styles.clothName}>{selectedCloth.name}</Text>
-                <View style={styles.hr} />
-                <Text style={styles.price}>
-                  {selectedCloth.size} mtr ................. Rs.
-                  {selectedCloth.price}
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontWeight: '600',
+                    textDecorationLine: 'underline',
+                    marginBottom: 5,
+                  }}>
+                  Cloth will be couriered to the below mentioned address (Our
+                  Office Address)
                 </Text>
+                <Text style={{color: '#fff'}}>3/235</Text>
+                <Text style={{color: '#fff'}}>test street,</Text>
+                <Text style={{color: '#fff'}}>area</Text>
+                <Text style={{color: '#fff'}}>district</Text>
+                <Text style={{color: '#fff'}}>state</Text>
+                <Text style={{color: '#fff'}}>PIN: 000 000</Text>
               </View>
-            </>
-          ) : cloth_couriered ? (
-            <View>
-              <Text
-                style={{
-                  fontWeight: '500',
-                  fontSize: 15,
-                  marginBottom: 15,
-                  color: '#fff',
-                }}>
-                Cloth will be couriered to the below mentioned address (Our
-                Office Address)
-              </Text>
-              <Text style={{color: '#fff'}}>3/235</Text>
-              <Text style={{color: '#fff'}}>test street,</Text>
-              <Text style={{color: '#fff'}}>area</Text>
-              <Text style={{color: '#fff'}}>district</Text>
-              <Text style={{color: '#fff'}}>state</Text>
-              <Text style={{color: '#fff'}}>PIN: 000 000</Text>
-            </View>
-          ) : (
-            <View>
-              <View
-                style={{
-                  marginBottom: 5,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={10}
-                  style={{marginRight: 5}}
-                  color="#fff"
-                />
-                <Text style={{fontSize: 10, color: '#fff'}}>
-                  No cloth selected, it will collect from the customer provided
-                  location
+            ) : (
+              // -------------- Cloth will pickup from customer location -------------- //
+              <View>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontWeight: '600',
+                    textDecorationLine: 'underline',
+                    marginBottom: 5,
+                  }}>
+                  Cloth will pick up from:
                 </Text>
+                <Text style={{color: '#fff'}}>{cloth_pickuplocation}</Text>
               </View>
-              <Text
-                style={{
-                  color: '#fff',
-                  fontWeight: '600',
-                  textDecorationLine: 'underline',
-                }}>
-                Cloth will pick up from:
-              </Text>
-              <Text style={{color: '#fff'}}>{cloth_pickuplocation}</Text>
-            </View>
-          )}
+            )}
+          </View>
         </View>
 
         <View style={[styles.addressSection, {paddingBottom: 0}]}>

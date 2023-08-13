@@ -98,7 +98,7 @@ function FinalQuote({navigation, route}) {
         const payload = {
           orderStatus: 'complete',
           orderDeliveryStatus: 'pending',
-          orderPaymentStatus: 'pending',
+          orderPaymentStatus: 'partial',
           totalPrice: 1000,
           alreadyPaid: 600,
           razorpayPaymentId: data.razorpay_payment_id,

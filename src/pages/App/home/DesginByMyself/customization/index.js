@@ -15,7 +15,7 @@ import {
   Pressable,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {updateOrder} from '../../../../../redux/slices/order';
 import Button from '../../../../../reusables/button';
 import MyShirt from '../../../../../reusables/customization/myshirt';
@@ -33,18 +33,20 @@ import {
 
 function ShirtCustomization({routes, navigation}) {
   const dispatch = useDispatch();
+  const orders = useSelector(state => state.orders);
+  const {orderedDesign} = orders;
   const [config, setConfig] = useState({
-    collor: '',
-    pocket: '',
-    sleeve: '',
-    cuff: '',
-    cuffStyle: '',
-    back: '',
-    stamp: '',
+    collor: orderedDesign?.collor || '',
+    pocket: orderedDesign?.pocket || '',
+    sleeve: orderedDesign?.sleeve || '',
+    cuff: orderedDesign?.cuff || '',
+    cuffStyle: orderedDesign?.cuffStyle || '',
+    back: orderedDesign?.back || '',
+    stamp: orderedDesign?.stamp || '',
   });
   const [selectedIndex, setSelection] = useState(0);
   const [isDone, setDone] = useState(false);
-  const [note, setNote] = useState();
+  const [note, setNote] = useState(orderedDesign?.notes || '');
 
   const getView = useMemo(() => {
     switch (selectedIndex) {
@@ -130,7 +132,11 @@ function ShirtCustomization({routes, navigation}) {
         },
       };
       dispatch(updateOrder(payload));
-      navigation.navigate('selectMeasurement');
+      if (orders?.id) {
+        navigation.navigate('vieworder');
+      } else {
+        navigation.navigate('selectMeasurement');
+      }
     } else {
       setDone(true);
     }
@@ -218,7 +224,7 @@ function ShirtCustomization({routes, navigation}) {
           <View style={{marginTop: 20}}>
             <Button
               type={isValid() ? 'primary' : 'disabled'}
-              label="save & next"
+              label={orders?.id ? 'update & continue' : 'save & next'}
               disabled={!isValid()}
               onPress={() => saveCustomization()}
             />

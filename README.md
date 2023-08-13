@@ -53,14 +53,20 @@ Issues
     - [x] Copy Summary page and show the details except continue order. 
     - [x] Add button 1 ['continue']
     - [x] Add button 2 as text ['cancel order']
-  - [ ] modify order details
-    - [ ] Add edit icon in all the sections, 
-    - [ ] when user click that redirect to that specific page or open modal. 
-    - [ ] Once that activity done that should come back view order page but don't call the api. once they click update order then only it will save. but meanwhile all the changes will available in redux
+  - [x] modify order details
+    - [x] Add edit icon in all the sections, 
+    - [x] when user click that redirect to that specific page or open modal. 
+    - [x] Once that activity done that should come back view order page but don't call the api. once they click update order then only it will save. but meanwhile all the changes will available in redux
+  
+Future Scope
+------------
   - [ ] cancel order (payment return and cancellation charge and that flow will go....)
   - [ ] Move images to s3 bucket in django
 
 
+Major Pendings
+---------------
+- [ ] Review the Pant order flow
 
 
 Reference Image

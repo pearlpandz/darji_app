@@ -37,7 +37,7 @@ import {setLoader} from '../../../redux/slices/loader';
 import {HOST} from '../../../../env';
 import MEN_IMAGE from './../../../assets/images/men.png';
 import {AuthContext} from '../../../services/context';
-import {updateOrder} from '../../../redux/slices/order';
+import {resetOrder, updateOrder} from '../../../redux/slices/order';
 
 function CartPage({navigation}) {
   const dispatch = useDispatch();
@@ -97,7 +97,7 @@ function CartPage({navigation}) {
   );
 
   const redirectTo = (item, status) => {
-    console.log('redirectTo', item, status);
+    dispatch(resetOrder());
     dispatch(updateOrder(item));
     navigation.navigate('Common', {
       screen: 'vieworder',
@@ -118,14 +118,32 @@ function CartPage({navigation}) {
     }
     if (selectedType) {
       const field = selectedType.split('.');
-      orderList = orderList.filter(a => a[field[0]] === field[1]);
+      console.log('field', field);
       className = field[0];
+
       if (field[0] === 'orderPaymentStatus') {
-        orderStatus = 'payment ' + field[1];
+        if (field[1] === 'pending') {
+          orderStatus = 'payment ' + field[1];
+          orderList = orderList.filter(
+            a => a[field[0]] === field[1] && a.orderStatus === 'complete',
+          );
+        } else if (field[1] === 'partial') {
+          orderStatus = 'partially paid';
+          orderList = orderList.filter(
+            a => a[field[0]] === field[1] && a.orderStatus === 'complete',
+          );
+        }
       } else if (field[0] === 'orderStatus') {
         orderStatus = field[1];
+        orderList = orderList.filter(a => a[field[0]] === field[1]);
       } else if (field[0] === 'orderDeliveryStatus') {
         orderStatus = 'delivery ' + field[1];
+        orderList = orderList.filter(
+          a =>
+            a[field[0]] === field[1] &&
+            a.orderStatus === 'complete' &&
+            a.orderPaymentStatus === 'complete',
+        );
       }
     }
     return (

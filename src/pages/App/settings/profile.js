@@ -174,7 +174,9 @@ function Profile({navigation}) {
               style={[styles.menu, {borderBottomWidth: 0}]}
               onPress={async () => {
                 setAuthStatus(false);
-                await AsyncStorage.setItem('isAuthenticated', String(false));
+                await AsyncStorage.removeItem('userinfo');
+                await AsyncStorage.removeItem('token');
+                await AsyncStorage.removeItem('isAuthenticated');
               }}>
               <View style={{flexDirection: 'row'}}>
                 <IonIcon name="power-outline" size={18} color="#000" />
