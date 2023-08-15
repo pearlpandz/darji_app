@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,11 +13,11 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BG from './../../../assets/profile-bg.webp';
 import AVATAR from './../../../assets/images/avatar.png';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {AuthContext} from '../../../services/context';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { AuthContext } from '../../../services/context';
 
-function Profile({navigation}) {
-  const {setAuthStatus} = useContext(AuthContext);
+function Profile({ navigation }) {
+  const { setAuthStatus } = useContext(AuthContext);
   const [userinfo, setUserInfo] = useState({});
 
   useEffect(() => {
@@ -31,7 +31,7 @@ function Profile({navigation}) {
 
   return (
     <SafeAreaView
-      style={{flex: 1, backgroundColor: '#fff', position: 'relative'}}>
+      style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
       <ScrollView>
         <Pressable
           style={{
@@ -44,8 +44,8 @@ function Profile({navigation}) {
           onPress={() => navigation.goBack()}>
           <IonIcon name="chevron-back" size={26} color="#fff" />
         </Pressable>
-        <View style={{position: 'relative'}}>
-          <View style={{height: 150, overflow: 'hidden'}}>
+        <View style={{ position: 'relative' }}>
+          <View style={{ height: 150, overflow: 'hidden' }}>
             <Image
               source={BG}
               alt="profile background"
@@ -121,20 +121,21 @@ function Profile({navigation}) {
                   screen: 'viewprofile',
                 });
               }}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <IonIcon name="person-outline" size={18} color="#000" />
                 <Text style={styles.menuitem}>Account Information</Text>
               </View>
               <IonIcon name="chevron-forward" size={18} color="#000" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menu}>
+            {/* Future Scope  */}
+            {/* <TouchableOpacity style={styles.menu}>
               <View style={{flexDirection: 'row'}}>
                 <IonIcon name="settings-outline" size={18} color="#000" />
                 <Text style={styles.menuitem}>Settings</Text>
               </View>
               <IonIcon name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.menu}
@@ -143,7 +144,7 @@ function Profile({navigation}) {
                   screen: 'changepassword',
                 });
               }}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <IonIcon name="lock-closed-outline" size={18} color="#000" />
                 <Text style={styles.menuitem}>Change Password</Text>
               </View>
@@ -163,7 +164,7 @@ function Profile({navigation}) {
                 });
                 navigation.navigate('cart');
               }}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <IonIcon name="cart-outline" size={18} color="#000" />
                 <Text style={styles.menuitem}>My Orders</Text>
               </View>
@@ -171,14 +172,14 @@ function Profile({navigation}) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.menu, {borderBottomWidth: 0}]}
+              style={[styles.menu, { borderBottomWidth: 0 }]}
               onPress={async () => {
                 setAuthStatus(false);
                 await AsyncStorage.removeItem('userinfo');
                 await AsyncStorage.removeItem('token');
                 await AsyncStorage.removeItem('isAuthenticated');
               }}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <IonIcon name="power-outline" size={18} color="#000" />
                 <Text style={styles.menuitem}>Logout</Text>
               </View>

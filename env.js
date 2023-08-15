@@ -1,4 +1,4 @@
-const mode = 'dev';
+const mode = 'prod';
 const dev = {
   url: 'http://10.0.2.2:8000',
   razorpay: 'rzp_test_yoyoiR1jrrSMMg',

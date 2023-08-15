@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     top: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#fff",
-    width: 150,
+    // width: 100,
     textAlign: "center",
     paddingBottom: 5,
   },

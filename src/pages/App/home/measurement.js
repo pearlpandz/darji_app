@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
@@ -17,22 +17,23 @@ import {
   Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useDispatch, useSelector} from 'react-redux';
-import {updateOrder} from '../../../redux/slices/order';
+import Checkbox from '@react-native-community/checkbox';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateOrder } from '../../../redux/slices/order';
 import Button from '../../../reusables/button';
 import Shirt from '../../../reusables/customization/shirt';
 
-function Measurement({navigation}) {
+function Measurement({ navigation }) {
   const dispatch = useDispatch();
   const order = useSelector(state => state.orders);
-  const {measurements} = order;
+  const { measurements } = order;
   const customizeConfigs = [
-    {title: 'select body type', key: 'bodyType'},
-    {title: 'select shirt size', key: 'size'},
-    {title: 'select shoulder type', key: 'shoulder'},
-    {title: 'select height', key: 'height'},
-    {title: 'select preferred fit', key: 'fit'},
-    {title: 'write a note / record instructions', key: 'note'},
+    { title: 'select body type', key: 'bodyType' },
+    { title: 'select shirt size', key: 'size' },
+    { title: 'select shoulder type', key: 'shoulder' },
+    { title: 'select height', key: 'height' },
+    { title: 'select preferred fit', key: 'fit' },
+    { title: 'write a note / record instructions', key: 'note' },
   ];
 
   const bodyTypes = [
@@ -86,6 +87,8 @@ function Measurement({navigation}) {
 
   const [notes, setNotes] = useState(measurements?.notes || '');
 
+  const [shouldUpdateYourProfile, setUpdateProfile] = useState(true);
+
   const isValid = () => {
     return Object.values(config).every(a => a);
   };
@@ -104,9 +107,9 @@ function Measurement({navigation}) {
       };
       dispatch(updateOrder(payload));
       if (order?.id) {
-        navigation.navigate('Common', {screen: 'vieworder'});
+        navigation.navigate('Common', { screen: 'vieworder' });
       } else {
-        navigation.navigate('Common', {screen: 'successMeasurement'});
+        navigation.navigate('Common', { screen: 'successMeasurement' });
       }
       ToastAndroid.show('Measurements updated!', ToastAndroid.SHORT);
     } catch (error) {
@@ -123,18 +126,18 @@ function Measurement({navigation}) {
     }
   };
 
-  const customizer = ({item}) => {
+  const customizer = ({ item }) => {
     switch (item.key) {
       case 'bodyType':
         return (
-          <View key={item.index} style={[styles.card, {marginLeft: 20}]}>
+          <View key={item.index} style={[styles.card, { marginLeft: 20 }]}>
             <Text style={styles.cardInfo}>1/6</Text>
             <Text style={styles.cardTitle}>{item.title}</Text>
             <View style={styles.bodyCards}>
               {bodyTypes.map((body, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setConfig({...config, bodyType: body.name})}>
+                  onPress={() => setConfig({ ...config, bodyType: body.name })}>
                   <View
                     style={[
                       styles.bodyCard,
@@ -149,7 +152,7 @@ function Measurement({navigation}) {
                     ]}>
                     <Image
                       source={body.image}
-                      style={{height: 100, width: '100%'}}
+                      style={{ height: 100, width: '100%' }}
                       alt={body.name}
                       resizeMode="contain"
                     />
@@ -175,11 +178,11 @@ function Measurement({navigation}) {
           <View key={item.index} style={[styles.card]}>
             <Text style={styles.cardInfo}>2/6</Text>
             <Text style={styles.cardTitle}>{item.title}</Text>
-            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               {[36, 38, 40, 42, 44, 46, 48].map((item, key) => (
                 <TouchableOpacity
                   key={key}
-                  onPress={() => setConfig({...config, size: item})}>
+                  onPress={() => setConfig({ ...config, size: item })}>
                   <Text
                     style={[
                       styles.size,
@@ -208,7 +211,7 @@ function Measurement({navigation}) {
               {shoulderTypes.map((body, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setConfig({...config, shoulder: body.name})}>
+                  onPress={() => setConfig({ ...config, shoulder: body.name })}>
                   <View
                     style={[
                       styles.bodyCard,
@@ -223,7 +226,7 @@ function Measurement({navigation}) {
                     ]}>
                     <Image
                       source={body.image}
-                      style={{height: 100, width: '100%'}}
+                      style={{ height: 100, width: '100%' }}
                       alt={body.name}
                       resizeMode="contain"
                     />
@@ -249,7 +252,7 @@ function Measurement({navigation}) {
           <View key={item.index} style={[styles.card]}>
             <Text style={styles.cardInfo}>4/6</Text>
             <Text style={styles.cardTitle}>{item.title}</Text>
-            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
               {[
                 "5'0",
                 "5'1",
@@ -264,7 +267,7 @@ function Measurement({navigation}) {
               ].map((item, key) => (
                 <TouchableOpacity
                   key={key}
-                  onPress={() => setConfig({...config, height: item})}>
+                  onPress={() => setConfig({ ...config, height: item })}>
                   <Text
                     style={[
                       styles.size,
@@ -294,7 +297,7 @@ function Measurement({navigation}) {
               {fitTypes.map((body, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => setConfig({...config, fit: body.name})}>
+                  onPress={() => setConfig({ ...config, fit: body.name })}>
                   <View
                     style={[
                       styles.bodyCard,
@@ -307,7 +310,7 @@ function Measurement({navigation}) {
                     ]}>
                     <Image
                       source={body.image}
-                      style={{height: 100, width: '100%'}}
+                      style={{ height: 100, width: '100%' }}
                       alt={body.name}
                       resizeMode="contain"
                     />
@@ -330,10 +333,10 @@ function Measurement({navigation}) {
 
       case 'note':
         return (
-          <View style={{marginBottom: 10}}>
+          <View style={{ marginBottom: 10 }}>
             <View
               key={item.index}
-              style={[styles.card, {paddingHorizontal: 20, marginBottom: 10}]}>
+              style={[styles.card, { paddingHorizontal: 20, marginBottom: 10 }]}>
               <Text style={styles.cardInfo}>6/6</Text>
               <Text style={styles.cardTitle}>{item.title}</Text>
               <TextInput
@@ -346,6 +349,17 @@ function Measurement({navigation}) {
                   setNotes(_notes);
                 }}
               />
+            </View>
+            <View style={[styles.checkboxContainer]}>
+              <Checkbox
+                value={shouldUpdateYourProfile}
+                onValueChange={setUpdateProfile}
+                style={styles.checkbox}
+                tintColors={{ true: '#fff' }}
+              />
+              <Text style={[styles.label, { flex: 1, flexWrap: 'wrap' }]}>
+                Are you wish to update these measurements in your profile?
+              </Text>
             </View>
             <Button
               label={order?.id ? 'update & continue' : 'save & next'}
@@ -363,7 +377,7 @@ function Measurement({navigation}) {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#87BCBF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#87BCBF' }}>
       <ScrollView
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}>
@@ -375,13 +389,13 @@ function Measurement({navigation}) {
               color="#fff"
               onPress={() => navigation.goBack()}
             />
-            <Text style={{color: '#fff', fontSize: 16, fontWeight: '500'}}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>
               Measurements (Shirt)
             </Text>
           </View>
         </View>
 
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <Shirt config={config} />
         </View>
         <View>
@@ -455,6 +469,22 @@ const styles = StyleSheet.create({
     borderColor: '#E6E6E6',
     padding: 15,
     borderRadius: 12,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    alignItems: 'flex-start',
+  },
+  checkbox: {
+    // alignSelf: 'center',
+  },
+  label: {
+    marginVertical: 2,
+    paddingRight: 20,
+    lineHeight: 20,
+    color: '#fff',
+    width: 200,
+
   },
 });
 

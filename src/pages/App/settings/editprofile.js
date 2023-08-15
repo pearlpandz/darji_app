@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -21,12 +21,12 @@ import AVATAR from './../../../assets/images/avatar.png';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import GenderActionSheet from '../../../reusables/gendersheet';
-import {HOST} from '../../../../env';
+import { HOST } from '../../../../env';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loader from '../../../reusables/loader';
-import {useDispatch} from 'react-redux';
-import {setLoader} from '../../../redux/slices/loader';
+import { useDispatch } from 'react-redux';
+import { setLoader } from '../../../redux/slices/loader';
 
 const ACTIONITEMS = [
   {
@@ -43,20 +43,20 @@ const ACTIONITEMS = [
   },
 ];
 
-function EditProfile({navigation}) {
+function EditProfile({ navigation }) {
   const dispatch = useDispatch();
   const [submitted, setSubmitted] = useState(false);
   const [actionSheet, setActionSheet] = useState(false);
   const [profilePic, setProfilePic] = useState();
   const [formdata, setFormdata] = useState({
-    name: {value: '', isValid: false},
-    email: {value: '', isValid: false},
-    mobile: {value: '', isValid: false},
-    gender: {value: '', isValid: false},
+    name: { value: '', isValid: false },
+    email: { value: '', isValid: false },
+    mobile: { value: '', isValid: false },
+    gender: { value: '', isValid: false },
   });
 
   const handleChange = (field, value) => {
-    const _formdata = {...formdata};
+    const _formdata = { ...formdata };
     _formdata[field].value = value;
 
     if (field === 'password') {
@@ -72,7 +72,7 @@ function EditProfile({navigation}) {
         _formdata[field].isValid = false;
       }
     }
-    setFormdata({..._formdata});
+    setFormdata({ ..._formdata });
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,10 +107,10 @@ function EditProfile({navigation}) {
 
   const reset = () => {
     setFormdata({
-      name: {value: '', isValid: false},
-      email: {value: '', isValid: false},
-      mobile: {value: '', isValid: false},
-      gender: {value: '', isValid: false},
+      name: { value: '', isValid: false },
+      email: { value: '', isValid: false },
+      mobile: { value: '', isValid: false },
+      gender: { value: '', isValid: false },
     });
   };
 
@@ -126,7 +126,7 @@ function EditProfile({navigation}) {
           mobile_number: formdata.mobile.value,
           gender: formdata.gender.value,
         };
-        const {data} = await axios.patch(url, _payload, {
+        const { data } = await axios.patch(url, _payload, {
           headers: {
             Authorization: await AsyncStorage.getItem('token'),
           },
@@ -139,7 +139,7 @@ function EditProfile({navigation}) {
           } else {
             AlertIOS.alert('Successfully updated!');
           }
-          reset();
+          // reset();
         }
         dispatch(setLoader(false));
       }
@@ -147,8 +147,8 @@ function EditProfile({navigation}) {
       console.log(error);
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -163,20 +163,20 @@ function EditProfile({navigation}) {
     dispatch(setLoader(true));
     try {
       const url = `${HOST}/api/profile`;
-      const {data} = await axios.get(url, {
+      const { data } = await axios.get(url, {
         headers: {
           Authorization: await AsyncStorage.getItem('token'),
         },
       });
       if (data) {
         setFormdata({
-          name: {value: data.name, isValid: data.name ? true : false},
-          email: {value: data.email, isValid: data.email ? true : false},
+          name: { value: data.name, isValid: data.name ? true : false },
+          email: { value: data.email, isValid: data.email ? true : false },
           mobile: {
             value: data.mobile_number,
             isValid: data.mobile_number ? true : false,
           },
-          gender: {value: data.gender, isValid: data.gender ? true : false},
+          gender: { value: data.gender, isValid: data.gender ? true : false },
         });
         setProfilePic(data.profilePic);
         setTimeout(() => {
@@ -187,8 +187,8 @@ function EditProfile({navigation}) {
       console.log(error);
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -208,7 +208,7 @@ function EditProfile({navigation}) {
 
   return (
     <SafeAreaView
-      style={{flex: 1, backgroundColor: '#fff', position: 'relative'}}>
+      style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
       <Loader msg="loading..." />
       <ScrollView>
         <Pressable
@@ -222,8 +222,8 @@ function EditProfile({navigation}) {
           onPress={() => navigation.goBack()}>
           <IonIcon name="chevron-back" size={26} color="#fff" />
         </Pressable>
-        <View style={{position: 'relative'}}>
-          <View style={{height: 150, overflow: 'hidden'}}>
+        <View style={{ position: 'relative' }}>
+          <View style={{ height: 150, overflow: 'hidden' }}>
             <Image
               source={BG}
               alt="profile background"
@@ -266,7 +266,7 @@ function EditProfile({navigation}) {
             {/* Full Name */}
             <View style={styles.info}>
               <Text style={styles.title}>Name</Text>
-              <View style={[styles.inputContainer, {marginBottom: 5}]}>
+              <View style={[styles.inputContainer, { marginBottom: 5 }]}>
                 <IonIcons
                   style={styles.inputInsideIcon}
                   name="person-outline"
@@ -284,7 +284,7 @@ function EditProfile({navigation}) {
                 />
               </View>
               {submitted && !formdata.name.value && (
-                <Text style={{color: 'red', marginBottom: 15}}>
+                <Text style={{ color: 'red', marginBottom: 15 }}>
                   Please enter your name!
                 </Text>
               )}
@@ -292,7 +292,7 @@ function EditProfile({navigation}) {
 
             <View style={styles.info}>
               <Text style={styles.title}>Email</Text>
-              <View style={[styles.inputContainer, {marginBottom: 5}]}>
+              <View style={[styles.inputContainer, { marginBottom: 5 }]}>
                 <IonIcons
                   style={styles.inputInsideIcon}
                   name="mail-outline"
@@ -311,7 +311,7 @@ function EditProfile({navigation}) {
                 />
               </View>
               {submitted && !formdata.email.value && (
-                <Text style={{color: 'red', marginBottom: 15}}>
+                <Text style={{ color: 'red', marginBottom: 15 }}>
                   Please enter your email!
                 </Text>
               )}
@@ -319,7 +319,7 @@ function EditProfile({navigation}) {
 
             <View style={styles.info}>
               <Text style={styles.title}>Mobile Number</Text>
-              <View style={[styles.inputContainer, {marginBottom: 5}]}>
+              <View style={[styles.inputContainer, { marginBottom: 5 }]}>
                 <IonIcons
                   style={styles.inputInsideIcon}
                   name="call-outline"
@@ -338,7 +338,7 @@ function EditProfile({navigation}) {
                 />
               </View>
               {submitted && !formdata.mobile.value && (
-                <Text style={{color: 'red', marginBottom: 15}}>
+                <Text style={{ color: 'red', marginBottom: 15 }}>
                   Please enter your mobile number!
                 </Text>
               )}
@@ -350,14 +350,14 @@ function EditProfile({navigation}) {
                 onPress={() => setActionSheet(true)}
                 style={[
                   styles.select,
-                  {flexDirection: 'row', justifyContent: 'space-between'},
+                  { flexDirection: 'row', justifyContent: 'space-between' },
                 ]}>
-                <View style={{flexDirection: 'row'}}>
+                <View style={{ flexDirection: 'row' }}>
                   <IonIcons name="person-outline" size={18} color="#b9b9b9" />
-                  <Text style={{color: '#424242', marginLeft: 10}}>
+                  <Text style={{ color: '#424242', marginLeft: 10 }}>
                     {formdata.gender.value
                       ? ACTIONITEMS.find(a => a.value === formdata.gender.value)
-                          ?.label
+                        ?.label
                       : 'Please select your gender'}
                   </Text>
                 </View>
@@ -365,7 +365,7 @@ function EditProfile({navigation}) {
               </Pressable>
             </View>
 
-            <View style={{marginTop: 15}}>
+            <View style={{ marginTop: 15 }}>
               <Button
                 label="update info"
                 type="primary"

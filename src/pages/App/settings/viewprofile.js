@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,11 +17,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../../../reusables/button';
 import BG from './../../../assets/profile-bg.webp';
 import AVATAR from './../../../assets/images/avatar.png';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {AuthContext} from '../../../services/context';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { AuthContext } from '../../../services/context';
+import { useIsFocused } from '@react-navigation/native';
 
-function ViewProfile({navigation}) {
-  const {setAuthStatus} = useContext(AuthContext);
+function ViewProfile({ navigation }) {
+  const { setAuthStatus } = useContext(AuthContext);
+  const isFocused = useIsFocused();
   const [userinfo, setUserInfo] = useState({});
 
   useEffect(() => {
@@ -30,12 +32,14 @@ function ViewProfile({navigation}) {
       setUserInfo(_userinfo);
     };
 
-    getUserInfo();
-  }, []);
+    if (isFocused) {
+      getUserInfo();
+    }
+  }, [isFocused]);
 
   return (
     <SafeAreaView
-      style={{flex: 1, backgroundColor: '#fff', position: 'relative'}}>
+      style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
       <ScrollView>
         <Pressable
           style={{
@@ -48,8 +52,8 @@ function ViewProfile({navigation}) {
           onPress={() => navigation.goBack()}>
           <IonIcon name="chevron-back" size={26} color="#fff" />
         </Pressable>
-        <View style={{position: 'relative'}}>
-          <View style={{height: 150, overflow: 'hidden'}}>
+        <View style={{ position: 'relative' }}>
+          <View style={{ height: 150, overflow: 'hidden' }}>
             <Image
               source={BG}
               alt="profile background"
@@ -94,7 +98,7 @@ function ViewProfile({navigation}) {
                 borderRadius: 5,
                 marginTop: 15,
               }}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Text
                   style={{
                     color: '#fff',
@@ -113,7 +117,7 @@ function ViewProfile({navigation}) {
             }}>
             <View style={styles.info}>
               <Text style={styles.title}>Name</Text>
-              <Text style={{textTransform: 'capitalize'}}>
+              <Text style={{ textTransform: 'capitalize' }}>
                 {userinfo?.name}
               </Text>
             </View>
@@ -127,7 +131,7 @@ function ViewProfile({navigation}) {
             </View>
             <View style={styles.info}>
               <Text style={styles.title}>Gender</Text>
-              <Text style={{textTransform: 'capitalize'}}>
+              <Text style={{ textTransform: 'capitalize' }}>
                 {userinfo?.gender}
               </Text>
             </View>

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useContext} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,21 +16,38 @@ import {
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {AuthContext} from '../../services/context';
+import { AuthContext } from '../../services/context';
 import Button from '../../reusables/button';
 
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
-import {HOST} from '../../../env';
+import { HOST } from '../../../env';
+import Loader from '../../reusables/loader';
+import { setLoader } from '../../redux/slices/loader';
+import { useDispatch } from 'react-redux';
 
-function OtpValidation({route, navigation}) {
-  const {payload, type = 'register'} = route.params;
+function OtpValidation({ route, navigation }) {
+  const { payload, type = 'register' } = route.params;
   const mobileNumber = payload.mobile_number;
+
+  const dispatch = useDispatch();
+
   const [mobile, setMobileNumber] = useState(false);
   const [enteredOtp, setEnteredOtp] = useState();
-  const {setAuthStatus} = useContext(AuthContext);
-  const [confirm, setConfirm] = useState(null);
+  const { setAuthStatus } = useContext(AuthContext);
+  const [confirm, setConfirm] = useState(false);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => {
+      setCounter(counter - 1)
+    }, 1000)
+
+    return () => {
+      clearInterval(timer);
+    }
+  }, [counter])
 
   const isExisting = async () => {
     try {
@@ -40,14 +57,14 @@ function OtpValidation({route, navigation}) {
         mobile_number: mobile,
       };
       const data = await axios.post(url, _payload);
-      if (data.isExisting) {
+      if (!data.isExisting) {
         registerUser();
       }
     } catch (error) {
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -64,11 +81,12 @@ function OtpValidation({route, navigation}) {
       _payload.mobile_number = mobile;
       await axios.post(url, payload);
       setConfirm(true);
+      setCounter(20);
     } catch (error) {
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -80,12 +98,16 @@ function OtpValidation({route, navigation}) {
 
   const getOtp = async () => {
     try {
+      dispatch(setLoader(true));
       const url = `${HOST}/api/forgetpassword`;
-      const _payload = {mobile_number: mobile};
+      const _payload = { mobile_number: mobile };
       await axios.post(url, _payload);
+      dispatch(setLoader(false));
+      setCounter(20);
       setConfirm(true);
     } catch (error) {
       console.log(JSON.stringify(error.response.data));
+      dispatch(setLoader(false));
       const msg =
         Object.values(error.response.data.error)
           .map(a => a.toString())
@@ -100,28 +122,32 @@ function OtpValidation({route, navigation}) {
 
   const _verifyMobileNumber = async () => {
     try {
+      dispatch(setLoader(true));
       console.log('-------------- otp verified -----------------');
       const url = `${HOST}/api/verifyMobileNumber`;
-      const _payload = {mobile_number: mobile, otp: enteredOtp};
-      const {data} = await axios.put(url, _payload);
+      const _payload = { mobile_number: mobile, otp: enteredOtp };
+      const { data } = await axios.put(url, _payload);
       await AsyncStorage.setItem('token', data.token);
       if (data) {
+        dispatch(setLoader(false));
         console.log('-------------- otp verified -----------------');
         if (type === 'register') {
-          setAuthStatus(true);
           await AsyncStorage.setItem('isAuthenticated', String(true));
+          await AsyncStorage.setItem('userinfo', JSON.stringify(data.userinfo));
+          setAuthStatus(true);
           ToastAndroid.show('Mobile Number verified!', ToastAndroid.SHORT);
         } else {
           navigation.navigate('setpassword');
         }
       }
     } catch (error) {
+      dispatch(setLoader(false));
       console.log(error);
       console.log(JSON.stringify(error));
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -142,8 +168,9 @@ function OtpValidation({route, navigation}) {
 
   return (
     <View style={styles.container}>
+      <Loader />
       {confirm ? (
-        <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
+        <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
           <Text
             style={{
               textTransform: 'uppercase',
@@ -159,12 +186,12 @@ function OtpValidation({route, navigation}) {
               color: '#585758',
             }}>
             We have sent a code to{' '}
-            <Text style={{fontWeight: 'bold'}}>{mobileNumber || mobile},</Text>
+            <Text style={{ fontWeight: 'bold' }}>{mobileNumber || mobile},</Text>
           </Text>
 
-          <View style={{alignItems: 'center', marginVertical: 25}}>
+          <View style={{ alignItems: 'center', marginVertical: 25 }}>
             <OTPInputView
-              style={{width: '60%', height: 50}}
+              style={{ width: '60%', height: 50 }}
               pinCount={6}
               autoFocusOnLoad
               codeInputFieldStyle={styles.underlineStyleBase}
@@ -188,17 +215,18 @@ function OtpValidation({route, navigation}) {
             />
           </View>
 
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Button
               type="disabled"
-              label="Resend code in 00:39"
-              width={'auto'}
+              label={`Resend code in 00:${counter.toString().padStart(2, '0')}`}
+              width={200}
             />
-            <View style={{marginVertical: 10}} />
+            <View style={{ marginVertical: 10 }} />
             <Button
-              type="primaryoutline"
+              type={counter > 0 ? "disabled" : "primaryoutline"}
+              disabled={counter > 0}
               label="Resend Code"
-              width={'auto'}
+              width={120}
               onPress={() => {
                 console.log('get the otp again....');
                 getOtp();
@@ -207,9 +235,9 @@ function OtpValidation({route, navigation}) {
           </View>
         </View>
       ) : (
-        <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
+        <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
           {/* Mobile Number */}
-          <View style={[styles.inputContainer, {marginBottom: 15}]}>
+          <View style={[styles.inputContainer, { marginBottom: 15 }]}>
             <IonIcons
               style={styles.inputInsideIcon}
               name="call-outline"
@@ -227,7 +255,7 @@ function OtpValidation({route, navigation}) {
               underlineColorAndroid="transparent"
             />
           </View>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Button
               type="primary"
               label="get otp"

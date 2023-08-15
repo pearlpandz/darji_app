@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useContext} from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,20 +17,36 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
-import {AuthContext} from '../../../services/context';
+import { AuthContext } from '../../../services/context';
 import Button from '../../../reusables/button';
 
-import {HOST} from '../../../../env';
+import { HOST } from '../../../../env';
 import InputPassword from '../../../reusables/InputPassword';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setLoader } from '../../../redux/slices/loader';
+import Loader from '../../../reusables/loader';
+import { useDispatch } from 'react-redux';
 
-function ForgetPassword({route, navigation}) {
+function ForgetPassword({ route, navigation }) {
+  const dispatch = useDispatch();
+
   const [mobile, setMobileNumber] = useState(false);
   const [password, setPassword] = useState();
   const [enteredOtp, setEnteredOtp] = useState();
   const [confirm, setConfirm] = useState(null);
   const [showPasswordView, setPasswordView] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => {
+      setCounter(counter - 1)
+    }, 1000)
+
+    return () => {
+      clearInterval(timer);
+    }
+  }, [counter])
 
   const getCookie = name => {
     const value = `; ${document.cookie}`;
@@ -43,19 +59,21 @@ function ForgetPassword({route, navigation}) {
 
   const createPassword = async () => {
     setSubmitted(true);
+    dispatch(setLoader(true))
     try {
       if (password.length > 4) {
         const url = `${HOST}/api/createpassword`;
         const _payload = {
           password: password,
         };
-        const {data} = await axios.post(url, _payload, {
+        const { data } = await axios.post(url, _payload, {
           withCredentials: true,
           headers: {
             Authorization: await AsyncStorage.getItem('token'),
           },
         });
         if (data) {
+          dispatch(setLoader(false))
           setSubmitted(false);
           if (Platform.OS === 'android') {
             Alert.alert('Update Info', 'Successfully password changed!');
@@ -66,10 +84,11 @@ function ForgetPassword({route, navigation}) {
         }
       }
     } catch (error) {
+      dispatch(setLoader(false))
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -82,16 +101,24 @@ function ForgetPassword({route, navigation}) {
 
   const getOtp = async () => {
     try {
+      dispatch(setLoader(true));
       const url = `${HOST}/api/forgetpassword`;
       console.log(mobile);
-      const _payload = {mobile_number: mobile};
-      const {data} = await axios.post(url, _payload, {withCredentials: true});
+      const _payload = { mobile_number: mobile };
+      const { data } = await axios.post(url, _payload, { withCredentials: true });
       if (data) {
         console.log('data', data);
+        dispatch(setLoader(false));
+        setCounter(20);
         setConfirm(true);
       }
     } catch (error) {
-      const msg = error?.response?.data?.message;
+      dispatch(setLoader(false));
+      const msg = error?.response?.data
+        ? Object.values(error.response.data.error)
+          .map(a => a.toString())
+          .join(', ')
+        : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
       } else {
@@ -102,10 +129,11 @@ function ForgetPassword({route, navigation}) {
 
   const _verifyMobileNumber = async () => {
     try {
+      dispatch(setLoader(true))
       console.log('-------------- otp verified -----------------');
       const url = `${HOST}/api/verifyMobileNumber`;
-      const _payload = {mobile_number: mobile, otp: enteredOtp};
-      const {data} = await axios.put(url, _payload, {
+      const _payload = { mobile_number: mobile, otp: enteredOtp };
+      const { data } = await axios.put(url, _payload, {
         withCredentials: true,
         headers: {
           Authorization: await AsyncStorage.getItem('token'),
@@ -113,16 +141,19 @@ function ForgetPassword({route, navigation}) {
       });
       await AsyncStorage.setItem('token', data.token);
       if (data) {
+        dispatch(setLoader(false))
         console.log('-------------- otp verified -----------------');
         setPasswordView(true);
       }
     } catch (error) {
-      console.log(error);
-      console.log(JSON.stringify(error));
+      dispatch(setLoader(false))
+
+      console.log(JSON.stringify(error.response.data));
+
       const msg = error?.response?.data
         ? Object.values(error.response.data.error)
-            .map(a => a.toString())
-            .join(', ')
+          .map(a => a.toString())
+          .join(', ')
         : 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
@@ -143,22 +174,23 @@ function ForgetPassword({route, navigation}) {
 
   return (
     <View style={styles.container}>
-      <View style={{paddingVertical: 15, paddingHorizontal: 10}}>
+      <Loader />
+      <View style={{ paddingVertical: 15, paddingHorizontal: 10 }}>
         <Text style={styles.title}>forget password?</Text>
-        <View style={{flexDirection: 'row'}}>
-          <Text style={{marginRight: 5, color: '#707070', marginBottom: 10}}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ marginRight: 5, color: '#707070', marginBottom: 10 }}>
             Do you remember your password?
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate('authindex')}>
-            <Text style={{color: '#008efb', fontWeight: 'bold'}}>Login</Text>
+            <Text style={{ color: '#008efb', fontWeight: 'bold' }}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
       {showPasswordView ? (
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{ paddingHorizontal: 10 }}>
           <View>
             <InputPassword
-              placeholder="Current Password"
+              placeholder="Ente your password..."
               value={password}
               onChangeText={pass => setPassword(pass)}
             />
@@ -166,17 +198,17 @@ function ForgetPassword({route, navigation}) {
           {console.log('submitted', submitted, 'password', password)}
           {submitted &&
             (!password ? (
-              <Text style={{color: 'red', paddingTop: 5}}>
+              <Text style={{ color: 'red', paddingTop: 5 }}>
                 Please enter your password!
               </Text>
             ) : (
               password.length < 4 && (
-                <Text style={{color: 'red', paddingTop: 5}}>
+                <Text style={{ color: 'red', paddingTop: 5 }}>
                   Password length must be atleast 4 characters
                 </Text>
               )
             ))}
-          <View style={{marginTop: 10}}>
+          <View style={{ marginTop: 10 }}>
             {/* <Button label="cancel" type="secondary" onPress={() => navigation.goBack()} /> */}
             <Button
               label="update password"
@@ -188,7 +220,7 @@ function ForgetPassword({route, navigation}) {
           </View>
         </View>
       ) : confirm ? (
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{ paddingHorizontal: 10 }}>
           <Text
             style={{
               textTransform: 'uppercase',
@@ -204,12 +236,12 @@ function ForgetPassword({route, navigation}) {
               color: '#585758',
             }}>
             We have sent a code to{' '}
-            <Text style={{fontWeight: 'bold'}}>{mobile},</Text>
+            <Text style={{ fontWeight: 'bold' }}>{mobile},</Text>
           </Text>
 
-          <View style={{alignItems: 'center', marginVertical: 25}}>
+          <View style={{ alignItems: 'center', marginVertical: 25 }}>
             <OTPInputView
-              style={{width: '60%', height: 50}}
+              style={{ width: '60%', height: 50 }}
               pinCount={6}
               autoFocusOnLoad
               codeInputFieldStyle={styles.underlineStyleBase}
@@ -233,17 +265,18 @@ function ForgetPassword({route, navigation}) {
             />
           </View>
 
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Button
               type="disabled"
-              label="Resend code in 00:39"
-              width={'auto'}
+              label={`Resend code in 00:${counter.toString().padStart(2, '0')}`}
+              width={200}
             />
-            <View style={{marginVertical: 10}} />
+            <View style={{ marginVertical: 10 }} />
             <Button
-              type="primaryoutline"
+              type={counter > 0 ? "disabled" : "primaryoutline"}
+              disabled={counter > 0}
               label="Resend Code"
-              width={'auto'}
+              width={120}
               onPress={() => {
                 console.log('get the otp again....');
                 getOtp();
@@ -252,9 +285,9 @@ function ForgetPassword({route, navigation}) {
           </View>
         </View>
       ) : (
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{ paddingHorizontal: 10 }}>
           {/* Mobile Number */}
-          <View style={[styles.inputContainer, {marginBottom: 15}]}>
+          <View style={[styles.inputContainer, { marginBottom: 15 }]}>
             <IonIcons
               style={styles.inputInsideIcon}
               name="call-outline"
@@ -272,7 +305,7 @@ function ForgetPassword({route, navigation}) {
               underlineColorAndroid="transparent"
             />
           </View>
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Button
               type="primary"
               label="verify"
