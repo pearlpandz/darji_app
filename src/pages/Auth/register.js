@@ -272,7 +272,7 @@ function Register({navigation}) {
           </View>
 
           {/* separator */}
-          <View
+          {/* <View
             style={{
               marginVertical: 30,
               flexDirection: 'row',
@@ -280,10 +280,10 @@ function Register({navigation}) {
               justifyContent: 'space-around',
             }}>
             <Text>or sign up with</Text>
-          </View>
+          </View> */}
 
           {/* social login */}
-          <View style={{flexDirection: 'row'}}>
+          {/* <View style={{flexDirection: 'row'}}>
             <View style={styles.googleBtn}>
               <Pressable
                 onPress={() => {
@@ -351,7 +351,7 @@ function Register({navigation}) {
                 />
               </Pressable>
             </View>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </View>

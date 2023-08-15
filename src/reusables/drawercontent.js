@@ -31,7 +31,7 @@ export default function DrawerContentComp() {
           overflow: 'hidden',
         }}>
         <Image
-          source={userinfo.profilePic || AVATAR}
+          source={userinfo?.profilePic || AVATAR}
           style={{resizeMode: 'contain', width: '100%', height: '100%'}}
         />
       </View>

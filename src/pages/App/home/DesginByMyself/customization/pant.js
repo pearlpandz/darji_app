@@ -1,14 +1,32 @@
-import React, { useMemo, useState } from 'react'
-import { 
-  Text, View, StatusBar, SafeAreaView, StyleSheet, Image, FlatList, Dimensions, ScrollView, TextInput, Pressable, Alert, AlertIOS, 
+/* eslint-disable react-native/no-inline-styles */
+import React, { useMemo, useState } from 'react';
+import {
+  Text,
+  View,
+  SafeAreaView,
+  StyleSheet,
+  Image,
+  FlatList,
+  Dimensions,
+  ScrollView,
+  TextInput,
+  Pressable,
+  Alert,
+  AlertIOS,
   Platform,
-  ToastAndroid
-} from 'react-native'
+  ToastAndroid,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Button from '../../../../../reusables/button';
 import MyPant from '../../../../../reusables/customization/mypant';
 import PantOptions from './pantOptions';
-import { CUSTOMIZE_OPTIONS_PANT, PANTS, RAISES, FASTENINGS, WAISTS } from './constant';
+import {
+  CUSTOMIZE_OPTIONS_PANT,
+  PANTS,
+  RAISES,
+  FASTENINGS,
+  WAISTS,
+} from './constant';
 import { updateOrder } from '../../../../../redux/slices/order';
 import { useDispatch } from 'react-redux';
 
@@ -18,7 +36,7 @@ function PantCustomization({ routes, navigation }) {
     pant: '',
     rise: '',
     fastening: '',
-    waist: ''
+    waist: '',
   });
   const [selectedIndex, setSelection] = useState(0);
   const [isDone, setDone] = useState(false);
@@ -27,146 +45,197 @@ function PantCustomization({ routes, navigation }) {
   const getView = useMemo(() => {
     switch (selectedIndex) {
       case 0:
-        return <PantOptions
-          data={PANTS}
-          selected={config.pant}
-          setSelected={(item) => setConfig({ ...config, pant: item })}
-          height={220} />
+        return (
+          <PantOptions
+            data={PANTS}
+            selected={config.pant}
+            setSelected={item => setConfig({ ...config, pant: item })}
+            height={220}
+          />
+        );
 
       case 1:
-        return <PantOptions
-          data={RAISES}
-          selected={config.rise}
-          setSelected={(item) => setConfig({ ...config, rise: item })}
-          height={150} />
+        return (
+          <PantOptions
+            data={RAISES}
+            selected={config.rise}
+            setSelected={item => setConfig({ ...config, rise: item })}
+            height={150}
+          />
+        );
 
       case 2:
-        return <PantOptions
-          data={FASTENINGS}
-          selected={config.fastening}
-          setSelected={(item) => setConfig({ ...config, fastening: item })}
-          height={80} />
+        return (
+          <PantOptions
+            data={FASTENINGS}
+            selected={config.fastening}
+            setSelected={item => setConfig({ ...config, fastening: item })}
+            height={80}
+          />
+        );
 
       case 3:
-        return <PantOptions
-          data={WAISTS}
-          selected={config.waist}
-          setSelected={(item) => setConfig({ ...config, waist: item })}
-          height={60} />
+        return (
+          <PantOptions
+            data={WAISTS}
+            selected={config.waist}
+            setSelected={item => setConfig({ ...config, waist: item })}
+            height={60}
+          />
+        );
 
       default:
-        return <Text style={{ color: '#000' }}>{selectedIndex}</Text>
+        return <Text style={{ color: '#000' }}>{selectedIndex}</Text>;
     }
-  }, [selectedIndex, config])
+  }, [selectedIndex, config]);
 
   const isValid = () => {
     const values = Object.values(config);
     return values.every(a => a);
-  }
+  };
 
   const handleSubmit = async () => {
     try {
       const payload = {
-        "measurements": {
+        measurements: {
           ...config,
-          notes: note ? note : ""
-        }
-      }
+          notes: note ? note : '',
+        },
+      };
       dispatch(updateOrder(payload));
-      navigation.navigate('Common', { screen: 'successMeasurement' })
-      ToastAndroid.show("Measurements updated!", ToastAndroid.SHORT);
+      navigation.navigate('Common', { screen: 'successMeasurement' });
+      ToastAndroid.show('Measurements updated!', ToastAndroid.SHORT);
     } catch (error) {
       console.log(error);
-      const msg = Object.values(error.response.data).map(a => a.toString()).join(', ') || 'Something went wrong!';
+      const msg =
+        Object.values(error.response.data)
+          .map(a => a.toString())
+          .join(', ') || 'Something went wrong!';
       if (Platform.OS === 'android') {
         Alert.alert('Warning', msg);
       } else {
         AlertIOS.alert(msg);
       }
     }
-  }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#B9B0A2' }}>
-      <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        stickyHeaderIndices={[0]}
+        showsVerticalScrollIndicator={false}>
         <View>
           <View style={[styles.horizontalAlign]}>
-            <Ionicons name='chevron-back' size={22} color="#fff" onPress={() => navigation.goBack()} />
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>Pant</Text>
+            <Ionicons
+              name="chevron-back"
+              size={22}
+              color="#fff"
+              onPress={() => navigation.goBack()}
+            />
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>
+              Pant
+            </Text>
           </View>
         </View>
 
-        <View style={{ alignItems: 'center', justifyContent: 'center', marginBottom: 30 }}>
-          <MyPant config={config} />
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 30,
+          }}>
+          <MyPant config={config} selectedIndex={selectedIndex} />
         </View>
         <View style={styles.container}>
           <View style={styles.customizationSection}>
-            {
-              isDone ?
-                <View style={{ padding: 15 }}>
-                  <Text style={{ fontSize: 15, fontWeight: 'bold', marginBottom: 15 }}>Write a Note / Record Instructions</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder=""
-                    multiline
-                    numberOfLines={15}
-                    value={note}
-                    onChangeText={(_note) => { setNote(_note) }}
-                    underlineColorAndroid="transparent"
-                    textAlignVertical="top"
-                  />
-                </View> : <>
-                  <FlatList
-                    style={styles.customizeOption}
-                    data={CUSTOMIZE_OPTIONS_PANT}
-                    renderItem={({ item, index }) => {
-                      return (
-                        <Pressable
-                          style={[styles.optionCard, selectedIndex === index && styles.boxWithShadow, { borderColor: selectedIndex === index ? '#D97D54' : '#E6E6E6', margin: 12 }]}
-                          onPress={() => setSelection(index)}>
-                          <Image source={item.icon} style={styles.optionIcon} />
-                          <Text style={styles.optionLable}>{item.name}</Text>
-                        </Pressable>
-                      )
-                    }}
-                    scrollEnabled={true}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                  />
-                  <View style={styles.customizeSelection}>
-                    {getView}
-                  </View>
-                </>
-            }
+            {isDone ? (
+              <View style={{ padding: 15 }}>
+                <Text
+                  style={{ fontSize: 15, fontWeight: 'bold', marginBottom: 15 }}>
+                  Write a Note / Record Instructions
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder=""
+                  multiline
+                  numberOfLines={15}
+                  value={note}
+                  onChangeText={_note => {
+                    setNote(_note);
+                  }}
+                  underlineColorAndroid="transparent"
+                  textAlignVertical="top"
+                />
+              </View>
+            ) : (
+              <>
+                <FlatList
+                  style={styles.customizeOption}
+                  data={CUSTOMIZE_OPTIONS_PANT}
+                  renderItem={({ item, index }) => {
+                    return (
+                      <Pressable
+                        style={[
+                          styles.optionCard,
+                          selectedIndex === index && styles.boxWithShadow,
+                          {
+                            borderColor:
+                              selectedIndex === index ? '#D97D54' : '#E6E6E6',
+                            margin: 12,
+                          },
+                        ]}
+                        onPress={() => setSelection(index)}>
+                        <Image source={item.icon} style={styles.optionIcon} />
+                        <Text style={styles.optionLable}>{item.name}</Text>
+                      </Pressable>
+                    );
+                  }}
+                  scrollEnabled={true}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                />
+                <View style={styles.customizeSelection}>{getView}</View>
+              </>
+            )}
           </View>
           <View style={{ marginTop: 20 }}>
-            {
-              isDone ?
-              <Button type={isValid() ? 'primary' : 'disabled'} label='save & next' disabled={!isValid()} onPress={() => handleSubmit()} /> :
-              <Button type={isValid() ? 'primary' : 'disabled'} label='save & next' disabled={!isValid()} onPress={() => setDone(true)} />
-            }
+            {isDone ? (
+              <Button
+                type={isValid() ? 'primary' : 'disabled'}
+                label="save & next"
+                disabled={!isValid()}
+                onPress={() => handleSubmit()}
+              />
+            ) : (
+              <Button
+                type={isValid() ? 'primary' : 'disabled'}
+                label="save & next"
+                disabled={!isValid()}
+                onPress={() => setDone(true)}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   boxWithShadow: {
     shadowColor: '#FC9667',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 10
+    elevation: 10,
   },
   horizontalAlign: {
     flexDirection: 'row',
     padding: 15,
-    backgroundColor: '#B9B0A2'
+    backgroundColor: '#B9B0A2',
   },
   card: {
     backgroundColor: '#fff',
@@ -177,14 +246,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 12,
     position: 'relative',
-    height: 245
+    height: 245,
   },
   cardTitle: {
     color: '#334856',
     fontSize: 15,
     fontWeight: '500',
     textTransform: 'capitalize',
-    marginBottom: 15
+    marginBottom: 15,
   },
   bodyCards: {
     flexDirection: 'row',
@@ -193,7 +262,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     borderWidth: 2,
-    borderRadius: 12
+    borderRadius: 12,
   },
   size: {
     borderRadius: 50,
@@ -203,24 +272,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     textAlignVertical: 'center',
     marginRight: 15,
-    marginBottom: 15
+    marginBottom: 15,
   },
   cardInfo: {
     position: 'absolute',
     right: 10,
     top: -25,
     zIndex: 10,
-    color: '#fff'
+    color: '#fff',
   },
   input: {
     borderWidth: 1,
     borderColor: '#E6E6E6',
     padding: 15,
-    borderRadius: 12
+    borderRadius: 12,
   },
   customizationSection: {
     backgroundColor: '#fff',
-    borderRadius: 12
+    borderRadius: 12,
   },
   customizeOption: {
     paddingRight: 0,
@@ -234,24 +303,24 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingVertical: 5,
     paddingHorizontal: 15,
-    marginRight: 10
+    marginRight: 10,
   },
   optionIcon: {
     width: 15,
     height: 15,
     resizeMode: 'contain',
-    marginRight: 10
+    marginRight: 10,
   },
   optionLable: {
     fontSize: 12,
     color: '#324755',
-    textTransform: 'capitalize'
+    textTransform: 'capitalize',
   },
   customizeSelection: {
     padding: 10,
     flex: 1,
-    maxHeight: 350
-  }
-})
+    maxHeight: 350,
+  },
+});
 
-export default PantCustomization
+export default PantCustomization;

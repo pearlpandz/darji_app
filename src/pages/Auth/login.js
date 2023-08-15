@@ -267,7 +267,7 @@ function Login({navigation}) {
           </View>
 
           {/* separator */}
-          <View
+          {/* <View
             style={{
               marginVertical: 30,
               flexDirection: 'row',
@@ -275,10 +275,10 @@ function Login({navigation}) {
               justifyContent: 'space-around',
             }}>
             <Text>or sign in with</Text>
-          </View>
+          </View> */}
 
           {/* social login */}
-          <View style={{flexDirection: 'row'}}>
+          {/* <View style={{flexDirection: 'row'}}>
             <View style={styles.googleBtn}>
               <Pressable onPress={() => googleSignIn()}>
                 <IonIcons
@@ -320,7 +320,7 @@ function Login({navigation}) {
                 />
               </Pressable>
             </View>
-          </View>
+          </View> */}
         </View>
       </View>
     </View>
