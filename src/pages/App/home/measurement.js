@@ -88,6 +88,7 @@ function Measurement({ navigation }) {
   const [notes, setNotes] = useState(measurements?.notes || '');
 
   const [shouldUpdateYourProfile, setUpdateProfile] = useState(true);
+  const [measurementFor, setMeasurementFor] = useState('');
 
   const isValid = () => {
     return Object.values(config).every(a => a);
@@ -104,6 +105,8 @@ function Measurement({ navigation }) {
           fit: config.fit,
           notes: notes,
         },
+        should_tag: shouldUpdateYourProfile,
+        measurement_for: measurementFor
       };
       dispatch(updateOrder(payload));
       if (order?.id) {
@@ -358,9 +361,22 @@ function Measurement({ navigation }) {
                 tintColors={{ true: '#fff' }}
               />
               <Text style={[styles.label, { flex: 1, flexWrap: 'wrap' }]}>
-                Are you wish to update these measurements in your profile?
+                Are you wish to save these measurements?
               </Text>
             </View>
+
+            {
+              shouldUpdateYourProfile &&
+              <View style={{ marginBottom: 10, }}>
+                <TextInput
+                  style={[styles.input, { width: Dimensions.get('window').width - 60, padding: 10, backgroundColor: '#fff' }]}
+                  placeholder='Measurement For? (Ex: My Self or Any Others)'
+                  value={measurementFor}
+                  onChangeText={(event) => setMeasurementFor(event)}
+                />
+              </View>
+            }
+
             <Button
               label={order?.id ? 'update & continue' : 'save & next'}
               type="primary"
@@ -473,7 +489,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     marginBottom: 10,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   checkbox: {
     // alignSelf: 'center',

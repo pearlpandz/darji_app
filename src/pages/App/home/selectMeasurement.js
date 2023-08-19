@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useMemo} from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -12,7 +12,7 @@ import {
   AlertIOS,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import ValidatePinCode from './validatePincode';
@@ -20,8 +20,8 @@ import BottomBG from './../../../assets/images/bottom-bg-2.png';
 import Icon4 from './../../../assets/icons/icon-4.png';
 import Icon5 from './../../../assets/icons/icon-5.png';
 import Address from './address';
-import {useDispatch} from 'react-redux';
-import {updateOrder} from '../../../redux/slices/order';
+import { useDispatch } from 'react-redux';
+import { updateOrder } from '../../../redux/slices/order';
 
 import Banner from './../../../assets/images/measurement-banner.png';
 
@@ -38,7 +38,7 @@ function SelectMeasurement() {
         measurementAddress: address,
       };
       dispatch(updateOrder(payload));
-      navigation.navigate('Common', {screen: 'clothcategory'});
+      navigation.navigate('Common', { screen: 'clothcategory' });
     } catch (error) {
       console.log(error);
       const msg =
@@ -65,9 +65,8 @@ function SelectMeasurement() {
           <Address
             setActionSheet={setMeasureActionSheet}
             setAddress={address => {
-              const _address = `${address.fullAddress}${
-                address.floor ? ', ' + address.floor : ''
-              }${address.landmark ? ', ' + address.landmark : ''}`;
+              const _address = `${address.fullAddress}${address.floor ? ', ' + address.floor : ''
+                }${address.landmark ? ', ' + address.landmark : ''}`;
               console.log(_address);
               updateMeasurementAddress(_address);
             }}
@@ -103,26 +102,26 @@ function SelectMeasurement() {
   );
 
   return (
-    <ScrollView style={{color: '#fff'}}>
-      <View style={{position: 'relative'}}>
+    <ScrollView style={{ color: '#fff' }}>
+      <View style={{ position: 'relative' }}>
         <View style={styles.imgContainer}>
-          <Image source={Banner} style={{flex: 1}} />
+          <Image source={Banner} style={{ flex: 1 }} />
         </View>
-        <View style={[styles.designs, styles.boxWithShadow, {padding: 20}]}>
-          <View style={{borderBottomWidth: 1, borderColor: '#f1f3f4'}}>
+        <View style={[styles.designs, styles.boxWithShadow, { padding: 20 }]}>
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
             <View style={styles.desginView}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon4}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <TouchableOpacity
                     onPress={() => {
-                      navigation.navigate('Common', {screen: 'measurement'});
+                      navigation.navigate('Common', { screen: 'measurement' });
                     }}>
                     <Text style={styles.link}>
                       Submit Measurement Online Now
@@ -138,17 +137,17 @@ function SelectMeasurement() {
               <Ionicons name="chevron-forward" size={20} color="#e8875b" />
             </View>
           </View>
-          <View style={{borderBottomWidth: 1, borderColor: '#f1f3f4'}}>
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
             <View style={[styles.desginView]}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon5}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <TouchableOpacity
                     onPress={() => {
                       setMeasureActionSheet(true);
@@ -169,9 +168,37 @@ function SelectMeasurement() {
               <Ionicons name="chevron-forward" size={20} color="#e8875b" />
             </View>
           </View>
-          <View style={{alignItems: 'flex-end', height: 48}}>
+
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
+            <View style={[styles.desginView]}>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={styles.iconContainer}>
+                  <Image
+                    source={Icon4}
+                    style={{ flex: 1 }}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('Common', {
+                        screen: 'previousMeasurements'
+                      })
+                    }}>
+                    <Text style={styles.link}>
+                      Select Measurements from Previous
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#e8875b" />
+            </View>
+          </View>
+
+          <View style={{ alignItems: 'flex-end', height: 48 }}>
             <Image
-              style={{flex: 1, width: '100%'}}
+              style={{ flex: 1, width: '100%' }}
               source={BottomBG}
               resizeMode="cover"
             />
@@ -252,12 +279,12 @@ const styles = StyleSheet.create({
   },
   boxWithShadow: {
     shadowColor: '#666',
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 15,
   },
-  link: {color: '#305F72', fontSize: 16},
+  link: { color: '#305F72', fontSize: 16 },
   imgContainer: {
     height: 250,
     flex: 1,

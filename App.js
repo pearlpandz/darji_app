@@ -1,10 +1,10 @@
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import 'react-native-gesture-handler';
-import {NavigationContainer, DrawerActions} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { NavigationContainer, DrawerActions } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -50,12 +50,12 @@ import StylistPage from './src/pages/App/stylist';
 import DesginByMyself from './src/pages/App/home/DesginByMyself';
 import ShirtCustomization from './src/pages/App/home/DesginByMyself/customization';
 import PantCustomization from './src/pages/App/home/DesginByMyself/customization/pant';
-import {Image, Pressable, Text, View} from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import ReturnPage from './src/pages/App/return';
 import LOGO from './src/assets/logo-1.png';
-import {NetworkCheck} from './src/HOC/network';
+import { NetworkCheck } from './src/HOC/network';
 import store from './src/redux/store';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import SelectMeasurement from './src/pages/App/home/selectMeasurement';
 import CommingSoon from './src/pages/Auth/comingsoon';
 import SetPassword from './src/pages/App/settings/setpassword';
@@ -63,10 +63,11 @@ import ViewProfile from './src/pages/App/settings/viewprofile';
 import EditProfile from './src/pages/App/settings/editprofile';
 import DrawerContentComp from './src/reusables/drawercontent';
 import ViewOrder from './src/pages/App/home/vieworder';
+import MeasurementList from './src/pages/App/home/measurementList';
 
 const Drawer = createDrawerNavigator();
 const DrawerScreen = () => {
-  const {setAuthStatus} = useContext(AuthContext);
+  const { setAuthStatus } = useContext(AuthContext);
 
   return (
     <Drawer.Navigator
@@ -92,7 +93,7 @@ const DrawerScreen = () => {
               <DrawerContentComp />
               <DrawerItemList {...props} />
             </View>
-            <View style={{padding: 20}}>
+            <View style={{ padding: 20 }}>
               <Pressable
                 onPress={async () => {
                   setAuthStatus(false);
@@ -125,7 +126,7 @@ const DrawerScreen = () => {
         component={TabStackScreen}
         options={{
           headerShown: false,
-          drawerItemStyle: {height: 0},
+          drawerItemStyle: { height: 0 },
         }}
       />
       <Drawer.Screen
@@ -133,8 +134,8 @@ const DrawerScreen = () => {
         component={Profile}
         options={{
           drawerLabel: 'Profile',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons name="person-outline" size={size} color="#87BCBF" />
           ),
         }}
@@ -151,8 +152,8 @@ const DrawerScreen = () => {
             fontWeight: 'bold',
           },
           drawerLabel: 'orders',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons name="cart-outline" size={size} color="#87BCBF" />
           ),
         }}
@@ -162,8 +163,8 @@ const DrawerScreen = () => {
         component={ReturnPage}
         options={{
           drawerLabel: 'return',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons name="refresh-outline" size={size} color="#87BCBF" />
           ),
         }}
@@ -173,8 +174,8 @@ const DrawerScreen = () => {
         component={ReturnPage}
         options={{
           drawerLabel: 'help & support',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons name="help-buoy-outline" size={size} color="#87BCBF" />
           ),
         }}
@@ -184,8 +185,8 @@ const DrawerScreen = () => {
         component={ReturnPage}
         options={{
           drawerLabel: 'terms & conditions',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons
               name="document-text-outline"
               size={size}
@@ -199,8 +200,8 @@ const DrawerScreen = () => {
         component={ReturnPage}
         options={{
           drawerLabel: 'privacy policy',
-          drawerLabelStyle: {color: '#fff', textTransform: 'capitalize'},
-          drawerIcon: ({focused, size}) => (
+          drawerLabelStyle: { color: '#fff', textTransform: 'capitalize' },
+          drawerIcon: ({ focused, size }) => (
             <Ionicons name="shield-outline" size={size} color="#87BCBF" />
           ),
         }}
@@ -212,7 +213,7 @@ const DrawerScreen = () => {
 const WelcomeStack = createNativeStackNavigator();
 const WelcomeStackScreen = () => (
   <WelcomeStack.Navigator
-    screenOptions={{headerShown: false}}
+    screenOptions={{ headerShown: false }}
     initialRouteName="intro">
     <WelcomeStack.Screen name="intro" component={Welcome} />
   </WelcomeStack.Navigator>
@@ -221,7 +222,7 @@ const WelcomeStackScreen = () => (
 const AuthStack = createNativeStackNavigator();
 const AuthStackScreen = () => (
   <AuthStack.Navigator
-    screenOptions={{headerShown: false}}
+    screenOptions={{ headerShown: false }}
     initialRouteName="authindex">
     <AuthStack.Screen
       name="authindex"
@@ -302,8 +303,8 @@ const Tab = createBottomTabNavigator();
 const TabStackScreen = () => (
   <Tab.Navigator
     initialRouteName="design"
-    screenOptions={({route}) => ({
-      tabBarIcon: ({focused, color}) => {
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color }) => {
         // icon settings
         let iconName;
         if (route.name === 'landing') {
@@ -325,13 +326,13 @@ const TabStackScreen = () => (
       },
       tabBarActiveTintColor: '#e8875b',
       tabBarInactiveTintColor: 'gray',
-      tabBarLabelStyle: {fontSize: 12},
-      tabBarStyle: {height: 60, paddingBottom: 10, paddingTop: 5},
+      tabBarLabelStyle: { fontSize: 12 },
+      tabBarStyle: { height: 60, paddingBottom: 10, paddingTop: 5 },
     })}>
     <Tab.Screen
       name="landing"
       component={HomeStackScreen}
-      options={({navigation}) => ({
+      options={({ navigation }) => ({
         headerShown: false,
         tabBarLabel: 'Home',
       })}
@@ -355,12 +356,12 @@ const TabStackScreen = () => (
     <Tab.Screen
       name="cart"
       component={CartPage}
-      options={({navigation}) => ({
+      options={({ navigation }) => ({
         headerShown: true,
         headerTitle: () => (
           <Image
             source={LOGO}
-            style={{width: 150, height: 30, resizeMode: 'contain'}}
+            style={{ width: 150, height: 30, resizeMode: 'contain' }}
           />
         ),
         tabBarLabel: 'Cart',
@@ -369,7 +370,7 @@ const TabStackScreen = () => (
             name="md-menu-outline"
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
             size={24}
-            style={{paddingLeft: 15}}
+            style={{ paddingLeft: 15 }}
           />
         ),
       })}
@@ -387,7 +388,7 @@ const TabStackScreen = () => (
 
 const CommonStack = createNativeStackNavigator();
 const CommonStackScreen = () => (
-  <CommonStack.Navigator screenOptions={{headerShown: false}}>
+  <CommonStack.Navigator screenOptions={{ headerShown: false }}>
     <CommonStack.Screen
       name="viewprofile"
       component={ViewProfile}
@@ -466,7 +467,7 @@ const CommonStackScreen = () => (
     <CommonStack.Screen
       name="vieworder"
       component={ViewOrder}
-      options={({route}) => ({
+      options={({ route }) => ({
         headerShown: false,
       })}
     />
@@ -484,6 +485,14 @@ const CommonStackScreen = () => (
       options={() => ({
         title: 'Measurement',
         headerShown: false,
+      })}
+    />
+    <CommonStack.Screen
+      name="previousMeasurements"
+      component={MeasurementList}
+      options={() => ({
+        title: 'Pick Measurement',
+        headerShown: true,
       })}
     />
     <CommonStack.Screen
@@ -527,16 +536,16 @@ const HomeStackScreen = () => {
   return (
     <HomeStack.Navigator
       initialRouteName="home"
-      screenOptions={{headerShown: false}}>
+      screenOptions={{ headerShown: false }}>
       <HomeStack.Screen
         name="home"
         component={HomePage}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           headerShown: true,
           headerTitle: () => (
             <Image
               source={LOGO}
-              style={{width: 150, height: 30, resizeMode: 'contain'}}
+              style={{ width: 150, height: 30, resizeMode: 'contain' }}
             />
           ),
           headerLeft: () => (
@@ -544,7 +553,7 @@ const HomeStackScreen = () => {
               name="md-menu-outline"
               onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
               size={24}
-              style={{paddingRight: 15}}
+              style={{ paddingRight: 15 }}
             />
           ),
         })}
@@ -552,7 +561,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen
         name="selectdesign"
         component={SelectDesignOption}
-        options={({route}) => ({
+        options={({ route }) => ({
           title: route.params.title,
           headerShown: true,
           headerTitleStyle: {
@@ -564,7 +573,7 @@ const HomeStackScreen = () => {
       <HomeStack.Screen
         name="selectdress"
         component={SelectDressToDesign}
-        options={({route}) => ({
+        options={({ route }) => ({
           title: route.params.title,
           headerShown: true,
           headerTitleStyle: {
@@ -606,7 +615,7 @@ const BlogPageStack = createNativeStackNavigator();
 const BlogStackScreen = () => (
   <BlogPageStack.Navigator
     initialRouteName="index"
-    screenOptions={{headerShown: false}}>
+    screenOptions={{ headerShown: false }}>
     <BlogPageStack.Screen name="index" component={BlogPage} />
   </BlogPageStack.Navigator>
 );
@@ -616,16 +625,16 @@ const StylistPageStack = createNativeStackNavigator();
 const StylistStackScreen = () => (
   <StylistPageStack.Navigator
     initialRouteName="index"
-    screenOptions={{headerShown: false}}>
+    screenOptions={{ headerShown: false }}>
     <StylistPageStack.Screen
       name="index"
       component={StylistPage}
-      options={({navigation}) => ({
+      options={({ navigation }) => ({
         headerShown: true,
         headerTitle: () => (
           <Image
             source={LOGO}
-            style={{width: 150, height: 30, resizeMode: 'contain'}}
+            style={{ width: 150, height: 30, resizeMode: 'contain' }}
           />
         ),
         headerLeft: () => (
@@ -633,7 +642,7 @@ const StylistStackScreen = () => (
             name="md-menu-outline"
             onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
             size={24}
-            style={{paddingRight: 15}}
+            style={{ paddingRight: 15 }}
           />
         ),
       })}
@@ -646,16 +655,16 @@ const AccountPageStack = createNativeStackNavigator();
 const AccountStackScreen = () => (
   <AccountPageStack.Navigator
     initialRouteName="index"
-    screenOptions={{headerShown: false}}>
+    screenOptions={{ headerShown: false }}>
     <AccountPageStack.Screen name="index" component={AccountPage} />
   </AccountPageStack.Navigator>
 );
 
 const RootStack = createNativeStackNavigator();
-const RootStackScreen = ({isWelcomed, isAuthenticated}) => {
+const RootStackScreen = ({ isWelcomed, isAuthenticated }) => {
   return (
     <RootStack.Navigator
-      screenOptions={{headerShown: false}}
+      screenOptions={{ headerShown: false }}
       initialRouteName={
         isAuthenticated ? (isWelcomed ? 'App' : 'Welcome') : 'Auth'
       }>
@@ -729,7 +738,7 @@ const App = () => {
   useEffect(() => {
     let previousNetworkstatus;
     const NetworkTracker = NetInfo.addEventListener(
-      async ({isConnected, isInternetReachable}) => {
+      async ({ isConnected, isInternetReachable }) => {
         // used isInternetReachable as it makes sense, Sometimes data might run out but we can stick back to isConnected as well
         if (previousNetworkstatus !== isInternetReachable) {
           previousNetworkstatus = isInternetReachable;
@@ -745,10 +754,10 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <WelcomeContext.Provider value={{isWelcomed, setWelcome}}>
-        <AuthContext.Provider value={{isAuthenticated, setAuthStatus}}>
-          <NetworkContext.Provider value={{isOnline, setNetworkStatus}}>
-            <CurrentUserContext.Provider value={{session, setSession}}>
+      <WelcomeContext.Provider value={{ isWelcomed, setWelcome }}>
+        <AuthContext.Provider value={{ isAuthenticated, setAuthStatus }}>
+          <NetworkContext.Provider value={{ isOnline, setNetworkStatus }}>
+            <CurrentUserContext.Provider value={{ session, setSession }}>
               <NavigationContainer>
                 {isCheckedAsyncStorage ? (
                   <RootStackScreen

@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useMemo} from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -15,8 +15,8 @@ import {
   ToastAndroid,
   Platform,
 } from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {useNavigation} from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import ValidatePinCode from './validatePincode';
@@ -24,12 +24,12 @@ import BottomBG from './../../../assets/images/bottom-bg-2.png';
 import Icon4 from './../../../assets/icons/icon-4.png';
 import Icon5 from './../../../assets/icons/icon-5.png';
 import Address from './address';
-import {useDispatch, useSelector} from 'react-redux';
-import {updateOrder} from '../../../redux/slices/order';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateOrder } from '../../../redux/slices/order';
 
-function UploadReference({orderData}) {
+function UploadReference({ orderData }) {
   const dispatch = useDispatch();
-  const {orderType} = useSelector(state => state.orders);
+  const { orderType } = useSelector(state => state.orders);
   const navigation = useNavigation();
   const [imageList, setImageList] = useState([]);
   const [hasUploaded, setUploaded] = useState(false);
@@ -51,7 +51,7 @@ function UploadReference({orderData}) {
         // includeBase64: false,
         noData: true,
       },
-      ({assets}) => {
+      ({ assets }) => {
         if (assets) {
           const updateList = [...imageList, ...assets];
           setUploaded(true);
@@ -75,7 +75,7 @@ function UploadReference({orderData}) {
           });
         }),
       );
-      const payload = {reference: _imageList};
+      const payload = { reference: _imageList };
       dispatch(updateOrder(payload));
     } catch (error) {
       console.log(error);
@@ -97,7 +97,7 @@ function UploadReference({orderData}) {
         measurementAddress: address,
       };
       dispatch(updateOrder(payload));
-      navigation.navigate('Common', {screen: 'clothcategory'});
+      navigation.navigate('Common', { screen: 'clothcategory' });
     } catch (error) {
       console.log(error);
       const msg =
@@ -124,9 +124,8 @@ function UploadReference({orderData}) {
           <Address
             setActionSheet={setMeasureActionSheet}
             setAddress={address => {
-              const _address = `${address.fullAddress}${
-                address.floor ? ', ' + address.floor : ''
-              }${address.landmark ? ', ' + address.landmark : ''}`;
+              const _address = `${address.fullAddress}${address.floor ? ', ' + address.floor : ''
+                }${address.landmark ? ', ' + address.landmark : ''}`;
               console.log(_address);
               updateMeasurementAddress(_address);
             }}
@@ -170,7 +169,7 @@ function UploadReference({orderData}) {
   };
 
   return (
-    <ScrollView style={{color: '#fff'}}>
+    <ScrollView style={{ color: '#fff' }}>
       <View style={styles.imageContainer}>
         <Text style={styles.title}>upload reference images</Text>
         <View
@@ -185,14 +184,14 @@ function UploadReference({orderData}) {
             },
           ]}>
           {imageList.length > 0 && (
-            <View style={{overflow: 'hidden', borderRadius: 20}}>
+            <View style={{ overflow: 'hidden', borderRadius: 20 }}>
               <FlatList
                 data={imageList}
-                renderItem={({item, index}) => {
+                renderItem={({ item, index }) => {
                   return (
                     <View
                       key={item.index}
-                      style={{marginRight: 2, position: 'relative'}}>
+                      style={{ marginRight: 2, position: 'relative' }}>
                       <Pressable
                         onPress={() => removeItem(item)}
                         style={{
@@ -208,15 +207,15 @@ function UploadReference({orderData}) {
                         }}>
                         <Ionicons name="close-circle" size={16} color="#fff" />
                         <Text
-                          style={{color: '#fff', textTransform: 'capitalize'}}>
+                          style={{ color: '#fff', textTransform: 'capitalize' }}>
                           remove
                         </Text>
                       </Pressable>
                       <Image
                         resizeMode="cover"
                         resizeMethod="scale"
-                        style={{width: 120, height: 200}}
-                        source={{uri: item.uri}}
+                        style={{ width: 120, height: 200 }}
+                        source={{ uri: item.uri }}
                       />
                     </View>
                   );
@@ -233,11 +232,11 @@ function UploadReference({orderData}) {
           )}
         </View>
 
-        <View style={{paddingHorizontal: 20}}>
+        <View style={{ paddingHorizontal: 20 }}>
           <Pressable
             // onPress={handleImgUpload}
             onPress={handleFileUpload}
-            style={{borderColor: '#87BCBF', borderWidth: 1, borderRadius: 20}}>
+            style={{ borderColor: '#87BCBF', borderWidth: 1, borderRadius: 20 }}>
             <Text
               style={{
                 textAlign: 'center',
@@ -254,22 +253,22 @@ function UploadReference({orderData}) {
         </View>
       </View>
 
-      <View style={{paddingHorizontal: 20, position: 'relative'}}>
+      <View style={{ paddingHorizontal: 20, position: 'relative' }}>
         <View style={[styles.designs, styles.boxWithShadow]}>
-          <View style={{borderBottomWidth: 1, borderColor: '#f1f3f4'}}>
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
             <View style={styles.desginView}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon4}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <TouchableOpacity
                     onPress={() => {
-                      if (!hasUploaded) {
+                      if (imageList?.length === 0) {
                         ToastAndroid.show(
                           'Upload Reference Images, then continue to submit measurements!',
                           ToastAndroid.SHORT,
@@ -307,20 +306,21 @@ function UploadReference({orderData}) {
               <Ionicons name="chevron-forward" size={20} color="#e8875b" />
             </View>
           </View>
-          <View style={{borderBottomWidth: 1, borderColor: '#f1f3f4'}}>
+
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
             <View style={[styles.desginView]}>
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon5}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <TouchableOpacity
                     onPress={() => {
-                      if (!hasUploaded) {
+                      if (imageList?.length === 0) {
                         ToastAndroid.show(
                           'Upload Reference Images, then continue to collect measurements!',
                           ToastAndroid.SHORT,
@@ -345,9 +345,44 @@ function UploadReference({orderData}) {
               <Ionicons name="chevron-forward" size={20} color="#e8875b" />
             </View>
           </View>
-          <View style={{alignItems: 'flex-end', height: 48}}>
+
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
+            <View style={[styles.desginView]}>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={styles.iconContainer}>
+                  <Image
+                    source={Icon4}
+                    style={{ flex: 1 }}
+                    resizeMode="contain"
+                  />
+                </View>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (imageList?.length === 0) {
+                        ToastAndroid.show(
+                          'Upload Reference Images, then continue to collect measurements!',
+                          ToastAndroid.SHORT,
+                        );
+                      } else {
+                        navigation.navigate('Common', {
+                          screen: 'previousMeasurements'
+                        })
+                      }
+                    }}>
+                    <Text style={styles.link}>
+                      Select Measurements from Previous
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#e8875b" />
+            </View>
+          </View>
+
+          <View style={{ alignItems: 'flex-end', height: 48 }}>
             <Image
-              style={{flex: 1, width: '100%'}}
+              style={{ flex: 1, width: '100%' }}
               source={BottomBG}
               resizeMode="cover"
             />
@@ -428,12 +463,12 @@ const styles = StyleSheet.create({
   },
   boxWithShadow: {
     shadowColor: '#666',
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 15,
   },
-  link: {color: '#305F72', fontSize: 16},
+  link: { color: '#305F72', fontSize: 16 },
 });
 
 export default UploadReference;

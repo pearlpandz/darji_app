@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Fragment, useContext, useState} from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -21,18 +21,18 @@ import Button from '../../../reusables/button';
 
 import Cloth from './../../../assets/images/cloth.jpg';
 import axios from 'axios';
-import {HOST} from '../../../../env';
-import {updateOrder, resetOrder} from '../../../redux/slices/order';
-import {useDispatch, useSelector} from 'react-redux';
+import { HOST } from '../../../../env';
+import { updateOrder, resetOrder } from '../../../redux/slices/order';
+import { useDispatch, useSelector } from 'react-redux';
 import MyPant from '../../../reusables/customization/mypant';
-import {setLoader} from '../../../redux/slices/loader';
+import { setLoader } from '../../../redux/slices/loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthContext} from '../../../services/context';
+import { AuthContext } from '../../../services/context';
 import MyShirt from '../../../reusables/customization/myshirt';
 
-function Summary({navigation}) {
+function Summary({ navigation }) {
   const dispatch = useDispatch();
-  const {setAuthStatus} = useContext(AuthContext);
+  const { setAuthStatus } = useContext(AuthContext);
   const orders = useSelector(state => state.orders);
   const {
     orderType,
@@ -47,7 +47,7 @@ function Summary({navigation}) {
     orderedDesign,
     deliveryAddress,
   } = orders;
-  const config = {...measurements};
+  const config = { ...measurements };
   const selectedCloth = {
     size: cloth_length,
     price: cloth_total_price,
@@ -56,15 +56,67 @@ function Summary({navigation}) {
 
   const [address, setAddress] = useState(deliveryAddress || '');
 
+  const addMeasurement = async (payload) => {
+    try {
+      const url = `${HOST}/api/measurement`;
+      const _payload = {
+        value: payload?.measurements,
+        type: payload?.orderType,
+        measurement_for: payload?.measurement_for,
+        should_tag: payload?.should_tag
+      }
+      const response = await axios.post(url, _payload, {
+        withCredentials: true,
+        headers: {
+          Authorization: await AsyncStorage.getItem('token'),
+        },
+      });
+      if (response?.data) {
+        return response.data.id;
+      }
+    } catch (error) {
+      console.error(error);
+      const status_code = error.response.status;
+      if (status_code === 403 || status_code === 401) {
+        setAuthStatus(false);
+        if (Platform.OS === 'android') {
+          Alert.alert('Warning', 'Session Expired!');
+        } else {
+          AlertIOS.alert('Session Expired!');
+        }
+      } else {
+        const msg =
+          Object.values(error.response.data)
+            .map(a => a.toString())
+            .join(', ') || 'Something went wrong!';
+        if (Platform.OS === 'android') {
+          Alert.alert('Warning', msg);
+        } else {
+          AlertIOS.alert(msg);
+        }
+      }
+    }
+  }
+
   const createOrder = async (url, _payload1, isDraft) => {
-    const response = await axios.post(url, _payload1, {
+    dispatch(setLoader(true))
+    let measurementId = _payload1?.measurementId;
+    console.log('_payload?.measurementId', _payload1);
+    if (_payload1?.measurements && !measurementId) {
+      measurementId = await addMeasurement(_payload1);
+    }
+
+    let _payload = _payload1;
+    _payload['measurementId'] = measurementId;
+
+    const response = await axios.post(url, _payload, {
       withCredentials: true,
       headers: {
         Authorization: await AsyncStorage.getItem('token'),
       },
     });
     console.log('response', response);
-    const {data} = response;
+    const { data } = response;
     if (data) {
       console.log('order created', data.id);
       if (reference?.length > 0) {
@@ -94,7 +146,7 @@ function Summary({navigation}) {
       dispatch(setLoader(false));
 
       if (!isDraft) {
-        navigation.navigate('finalquote', {orderId: data.id});
+        navigation.navigate('finalquote', { orderId: data.id });
       } else {
         dispatch(resetOrder());
         navigation.reset({
@@ -118,7 +170,7 @@ function Summary({navigation}) {
       },
     });
     console.log('response', response);
-    const {data} = response;
+    const { data } = response;
     if (data) {
       console.log('order created', data.id);
       if (reference.filter(a => !a.id)?.length > 0) {
@@ -148,7 +200,7 @@ function Summary({navigation}) {
       dispatch(setLoader(false));
       console.log('isDraft', !isDraft);
       if (!isDraft) {
-        navigation.navigate('finalquote', {orderId: data.id});
+        navigation.navigate('finalquote', { orderId: data.id });
       } else {
         dispatch(resetOrder());
         navigation.reset({
@@ -175,7 +227,7 @@ function Summary({navigation}) {
       };
       dispatch(updateOrder(payload));
 
-      const _orders = {...orders};
+      const _orders = { ...orders };
       const id = _orders.cloth.id;
       delete _orders.cloth;
       const _payload1 = {
@@ -223,11 +275,11 @@ function Summary({navigation}) {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#87BCBF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#87BCBF' }}>
       <ScrollView
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}>
-        <View style={{marginBottom: 20, backgroundColor: '#87BCBF'}}>
+        <View style={{ marginBottom: 20, backgroundColor: '#87BCBF' }}>
           <View style={[styles.horizontalAlign]}>
             <Ionicons
               name="chevron-back"
@@ -235,7 +287,7 @@ function Summary({navigation}) {
               color="#fff"
               onPress={() => navigation.goBack()}
             />
-            <Text style={{color: '#fff', fontSize: 16, fontWeight: '500'}}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>
               Summary
             </Text>
           </View>
@@ -243,7 +295,7 @@ function Summary({navigation}) {
 
         {/* Customization */}
         <View>
-          <View style={[styles.flex, {paddingHorizontal: 20}]}>
+          <View style={[styles.flex, { paddingHorizontal: 20 }]}>
             <Text style={[styles.title]}>customization</Text>
           </View>
           {reference.length > 0 ? (
@@ -316,7 +368,7 @@ function Summary({navigation}) {
                   <View style={styles.measurement}>
                     <AttributeView label="Body Type" value={config.bodyType} />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView
                       label="Shirt Size"
                       value={config.shirtSize}
@@ -328,7 +380,7 @@ function Summary({navigation}) {
                       value={config.shoulderType}
                     />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Height" value={config.height} />
                   </View>
                   <View style={styles.measurement}>
@@ -338,7 +390,7 @@ function Summary({navigation}) {
 
                 <View>
                   <Text style={styles.label}>Notes / Instructions</Text>
-                  <Text style={[styles.value, {fontSize: 14}]}>
+                  <Text style={[styles.value, { fontSize: 14 }]}>
                     {config.notes}
                   </Text>
                 </View>
@@ -350,7 +402,7 @@ function Summary({navigation}) {
                   <View style={styles.measurement}>
                     <AttributeView label="Pant Type" value={config.pant} />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Rise Type" value={config.rise} />
                   </View>
                   <View style={styles.measurement}>
@@ -359,7 +411,7 @@ function Summary({navigation}) {
                       value={config.fastening}
                     />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Waist" value={config.waist} />
                   </View>
                 </View>
@@ -395,14 +447,14 @@ function Summary({navigation}) {
             padding: 20,
           }}>
           <View style={[styles.flex]}>
-            <Text style={[styles.title, {color: '#fff'}]}>Cloth Details</Text>
+            <Text style={[styles.title, { color: '#fff' }]}>Cloth Details</Text>
           </View>
-          <View style={[styles.titleCard, {padding: 0}]}>
+          <View style={[styles.titleCard, { padding: 0 }]}>
             {selectedCloth.name ? (
               // ---------- Cloth selected from app -------------- //
               <Fragment>
                 <View style={styles.iconContainer}>
-                  <Image source={Cloth} style={{flex: 1, width: '100%'}} />
+                  <Image source={Cloth} style={{ flex: 1, width: '100%' }} />
                 </View>
                 <View>
                   <Text style={styles.clothName}>{selectedCloth.name}</Text>
@@ -426,12 +478,12 @@ function Summary({navigation}) {
                   Cloth will be couriered to the below mentioned address (Our
                   Office Address)
                 </Text>
-                <Text style={{color: '#fff'}}>3/235</Text>
-                <Text style={{color: '#fff'}}>test street,</Text>
-                <Text style={{color: '#fff'}}>area</Text>
-                <Text style={{color: '#fff'}}>district</Text>
-                <Text style={{color: '#fff'}}>state</Text>
-                <Text style={{color: '#fff'}}>PIN: 000 000</Text>
+                <Text style={{ color: '#fff' }}>3/235</Text>
+                <Text style={{ color: '#fff' }}>test street,</Text>
+                <Text style={{ color: '#fff' }}>area</Text>
+                <Text style={{ color: '#fff' }}>district</Text>
+                <Text style={{ color: '#fff' }}>state</Text>
+                <Text style={{ color: '#fff' }}>PIN: 000 000</Text>
               </View>
             ) : (
               // -------------- Cloth will pickup from customer location -------------- //
@@ -445,13 +497,13 @@ function Summary({navigation}) {
                   }}>
                   Cloth will pick up from:
                 </Text>
-                <Text style={{color: '#fff'}}>{cloth_pickuplocation}</Text>
+                <Text style={{ color: '#fff' }}>{cloth_pickuplocation}</Text>
               </View>
             )}
           </View>
         </View>
 
-        <View style={[styles.addressSection, {paddingBottom: 0}]}>
+        <View style={[styles.addressSection, { paddingBottom: 0 }]}>
           <Text style={styles.subtitle}>Delivery Address</Text>
           <TextInput
             style={styles.input}
