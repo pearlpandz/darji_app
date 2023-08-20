@@ -141,6 +141,20 @@ function Profile({ navigation }) {
               style={styles.menu}
               onPress={() => {
                 navigation.navigate('Common', {
+                  screen: 'addresses',
+                });
+              }}>
+              <View style={{ flexDirection: 'row' }}>
+                <IonIcon name="home-outline" size={18} color="#000" />
+                <Text style={styles.menuitem}>Address</Text>
+              </View>
+              <IonIcon name="chevron-forward" size={18} color="#000" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menu}
+              onPress={() => {
+                navigation.navigate('Common', {
                   screen: 'changepassword',
                 });
               }}>

@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-unused-vars */
 import axios from 'axios';
-import React, {useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Text,
   View,
@@ -13,17 +13,17 @@ import {
   AlertIOS,
 } from 'react-native';
 import Button from '../../../reusables/button';
-import {HOST} from '../../../../env';
+import { HOST } from '../../../../env';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function ValidatePinCode({pin, setPin, setActionSheet}) {
+function ValidatePinCode({ pin, setPin, setActionSheet }) {
   const [pincodes, setCodes] = useState([]);
 
   const getCodes = async () => {
     try {
       const url = `${HOST}/api/pincodes`;
-      const {data} = await axios.get(url, {
+      const { data } = await axios.get(url, {
         withCredentials: true,
         headers: {
           Authorization: await AsyncStorage.getItem('token'),
@@ -69,24 +69,24 @@ function ValidatePinCode({pin, setPin, setActionSheet}) {
         {pin?.length === 6 && (
           <>
             {!isValid ? (
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="information-circle" size={20} color="red" />
-                <Text style={{color: 'red', marginBottom: 15, marginLeft: 5}}>
+                <Text style={{ color: 'red', marginBottom: 15, marginLeft: 5, width: '90%' }}>
                   We are providing limited services, please contact our office
-                  to add your pincode +91-8610100498
+                  to add your pincode +91-7502022870
                 </Text>
               </View>
             ) : (
-              <View style={{flexDirection: 'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 <Ionicons name="checkmark-circle" size={20} color="green" />
-                <Text style={{color: 'green', marginBottom: 15, marginLeft: 5}}>
+                <Text style={{ color: 'green', marginBottom: 15, marginLeft: 5 }}>
                   Pin Code is valid
                 </Text>
               </View>
             )}
           </>
         )}
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Button
             type="secondary"
             label="cancel"

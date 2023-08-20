@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useContext} from 'react';
+import React, { Fragment, useContext } from 'react';
 import {
   View,
   Text,
@@ -10,26 +10,27 @@ import {
   Alert,
   AlertIOS,
   Platform,
+  Pressable,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Shirt from '../../../reusables/customization/shirt';
 import Button from '../../../reusables/button';
 
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import RazorpayCheckout from 'react-native-razorpay';
-import {HOST, PAYMENT_KEY} from '../../../../env';
+import { HOST, PAYMENT_KEY } from '../../../../env';
 import MyPant from '../../../reusables/customization/mypant';
-import {updateOrder} from '../../../redux/slices/order';
+import { updateOrder } from '../../../redux/slices/order';
 import axios from 'axios';
-import {setLoader} from '../../../redux/slices/loader';
+import { setLoader } from '../../../redux/slices/loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function FinalQuote({navigation, route}) {
+function FinalQuote({ navigation, route }) {
   const dispatch = useDispatch();
   const orders = useSelector(state => state.orders);
-  const {orderType, measurements, deliveryAddress} = orders;
-  const {orderId} = route.params;
-  const config = {...measurements};
+  const { orderType, measurements, deliveryAddress } = orders;
+  const { orderId } = route.params;
+  const config = { ...measurements };
 
   const updateOrderInfo = async payload => {
     try {
@@ -42,7 +43,7 @@ function FinalQuote({navigation, route}) {
         },
       });
       console.log('response', response);
-      const {data} = response;
+      const { data } = response;
       if (data) {
         dispatch(setLoader(false));
         navigation.reset({
@@ -88,7 +89,7 @@ function FinalQuote({navigation, route}) {
         contact: userinfo.mobile_number, // get from async storage
         name: userinfo.name, // get from async storage
       },
-      theme: {color: '#53a20e'},
+      theme: { color: '#53a20e' },
     };
     RazorpayCheckout.open(options)
       .then(data => {
@@ -118,11 +119,11 @@ function FinalQuote({navigation, route}) {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#87BCBF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#87BCBF' }}>
       <ScrollView
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}>
-        <View style={{marginBottom: 20, backgroundColor: '#87BCBF'}}>
+        <View style={{ marginBottom: 20, backgroundColor: '#87BCBF' }}>
           <View style={[styles.horizontalAlign]}>
             <Ionicons
               name="chevron-back"
@@ -130,13 +131,13 @@ function FinalQuote({navigation, route}) {
               color="#fff"
               onPress={() => navigation.goBack()}
             />
-            <Text style={{color: '#fff', fontSize: 16, fontWeight: '500'}}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '500' }}>
               Final Quote
             </Text>
           </View>
         </View>
 
-        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           {orderType === 'shirt' ? (
             <Shirt config={config} />
           ) : orderType === 'pant' ? (
@@ -171,15 +172,35 @@ function FinalQuote({navigation, route}) {
           <View style={[styles.hr, styles.row]} />
           <View style={styles.row}>
             <View>
-              <Text style={styles.label}>Address</Text>
-              <Text>{deliveryAddress}</Text>
+              <View style={[styles.flex, { marginBottom: 10 }]}>
+                <Text style={[styles.title, { marginBottom: 0 }]}>Delivery Address</Text>
+                {deliveryAddress && <Pressable onPress={() => {
+                  navigation.push('Common', {
+                    screen: 'addresses',
+                    params: {
+                      isOrder: true,
+                      addressFor: 'deliveryAddress',
+                      selectedAddress: deliveryAddress
+                    }
+                  })
+                }}>
+                  <Text style={{ color: '#000' }}>
+                    <Ionicons name="pencil-outline" size={14} color="#000" /> Edit
+                  </Text>
+                </Pressable>}
+              </View>
+
+
+
+              {deliveryAddress && (
+                <Fragment>
+                  <Text>{deliveryAddress.house_number},{deliveryAddress.street},{deliveryAddress.area_name},{deliveryAddress.city},{deliveryAddress.state} - {deliveryAddress.pincode}</Text>
+                  {deliveryAddress.landmark && <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Landmark:</Text> {deliveryAddress.landmark}</Text>}
+                  <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Contact:</Text> {deliveryAddress.contact_number}</Text>
+                </Fragment>
+              )}
             </View>
-            <Button
-              type="primaryoutline"
-              label="edit"
-              width={100}
-              onPress={() => navigation.goBack()}
-            />
+
           </View>
           {/* <View style={styles.row}>
                         <Text style={{fontWeight: '500'}}>{cloth_name}</Text>
@@ -247,6 +268,18 @@ const styles = StyleSheet.create({
   btnInfo: {
     color: '#fff',
     textTransform: 'capitalize',
+  },
+  flex: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontWeight: 'bold',
+    textTransform: 'capitalize',
+    color: '#324755',
+    fontSize: 18,
+    marginBottom: 20,
   },
 });
 

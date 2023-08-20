@@ -19,7 +19,6 @@ import ValidatePinCode from './validatePincode';
 import BottomBG from './../../../assets/images/bottom-bg-2.png';
 import Icon4 from './../../../assets/icons/icon-4.png';
 import Icon5 from './../../../assets/icons/icon-5.png';
-import Address from './address';
 import { useDispatch } from 'react-redux';
 import { updateOrder } from '../../../redux/slices/order';
 
@@ -29,54 +28,7 @@ function SelectMeasurement() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [actionSheet, setActionSheet] = useState(false);
-  const [collectMeasureActionSheet, setMeasureActionSheet] = useState(false);
   const [pin, setPin] = useState();
-
-  const updateMeasurementAddress = async address => {
-    try {
-      const payload = {
-        measurementAddress: address,
-      };
-      dispatch(updateOrder(payload));
-      navigation.navigate('Common', { screen: 'clothcategory' });
-    } catch (error) {
-      console.log(error);
-      const msg =
-        Object.values(error.response.data)
-          .map(a => a.toString())
-          .join(', ') || 'Something went wrong!';
-      if (Platform.OS === 'android') {
-        Alert.alert('Warning', msg);
-      } else {
-        AlertIOS.alert(msg);
-      }
-    }
-  };
-
-  const CollectMeasuremntAddressModal = useMemo(
-    () => (
-      <Modal
-        isVisible={collectMeasureActionSheet}
-        style={{
-          margin: 0,
-          justifyContent: 'flex-end',
-        }}>
-        <View>
-          <Address
-            setActionSheet={setMeasureActionSheet}
-            setAddress={address => {
-              const _address = `${address.fullAddress}${address.floor ? ', ' + address.floor : ''
-                }${address.landmark ? ', ' + address.landmark : ''}`;
-              console.log(_address);
-              updateMeasurementAddress(_address);
-            }}
-          />
-        </View>
-      </Modal>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [collectMeasureActionSheet],
-  );
 
   const ActionSheetModal = useMemo(
     () => (
@@ -150,7 +102,13 @@ function SelectMeasurement() {
                 <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <TouchableOpacity
                     onPress={() => {
-                      setMeasureActionSheet(true);
+                      navigation.navigate('Common', {
+                        screen: 'addresses',
+                        params: {
+                          isOrder: true,
+                          addressFor: 'measurementAddress'
+                        }
+                      })
                     }}>
                     <Text style={styles.link}>
                       Collect Measurements at Home
@@ -206,7 +164,6 @@ function SelectMeasurement() {
         </View>
       </View>
       {ActionSheetModal}
-      {CollectMeasuremntAddressModal}
     </ScrollView>
   );
 }

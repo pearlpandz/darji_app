@@ -64,6 +64,7 @@ import EditProfile from './src/pages/App/settings/editprofile';
 import DrawerContentComp from './src/reusables/drawercontent';
 import ViewOrder from './src/pages/App/home/vieworder';
 import MeasurementList from './src/pages/App/home/measurementList';
+import AddressList from './src/pages/App/home/addressList';
 
 const Drawer = createDrawerNavigator();
 const DrawerScreen = () => {
@@ -517,6 +518,14 @@ const CommonStackScreen = () => (
       options={() => ({
         title: 'Pant',
         headerShown: false,
+      })}
+    />
+    <CommonStack.Screen
+      name="addresses"
+      component={AddressList}
+      options={() => ({
+        title: 'Addresses',
+        headerShown: true,
       })}
     />
     <CommonStack.Screen

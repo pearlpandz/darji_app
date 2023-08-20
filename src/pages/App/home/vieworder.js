@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {Fragment} from 'react';
+import React, { Fragment } from 'react';
 import {
   View,
   Text,
@@ -17,15 +17,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Shirt from '../../../reusables/customization/shirt';
 import AttributeView from './attributeView';
 import Button from '../../../reusables/button';
-import {launchImageLibrary} from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import Cloth from './../../../assets/images/cloth.jpg';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MyPant from '../../../reusables/customization/mypant';
-import {HOST} from '../../../../env';
+import { HOST } from '../../../../env';
 import MyShirt from '../../../reusables/customization/myshirt';
-import {updateOrder} from '../../../redux/slices/order';
+import { updateOrder } from '../../../redux/slices/order';
 
-function ViewOrder({navigation}) {
+function ViewOrder({ navigation }) {
   const dispatch = useDispatch();
   const orders = useSelector(state => state.orders);
   const {
@@ -47,7 +47,7 @@ function ViewOrder({navigation}) {
     orderStatus,
     orderedDesign,
   } = orders;
-  const config = {...measurements};
+  const config = { ...measurements };
   const selectedCloth = {
     ...cloth,
     size: cloth_length,
@@ -55,7 +55,7 @@ function ViewOrder({navigation}) {
   };
 
   const handleContinue = () => {
-    navigation.navigate('Common', {screen: 'summary'});
+    navigation.navigate('Common', { screen: 'summary' });
   };
 
   const handleCancelOrder = () => {
@@ -65,11 +65,11 @@ function ViewOrder({navigation}) {
   const handleCustomization = () => {
     switch (orderType) {
       case 'shirt':
-        navigation.navigate('Common', {screen: 'shirtCustomization'});
+        navigation.navigate('Common', { screen: 'shirtCustomization' });
         break;
 
       case 'pant':
-        navigation.navigate('Common', {screen: 'pantCustomization'});
+        navigation.navigate('Common', { screen: 'pantCustomization' });
         break;
 
       default:
@@ -80,11 +80,11 @@ function ViewOrder({navigation}) {
   const handleMeasurements = () => {
     switch (orderType) {
       case 'shirt':
-        navigation.navigate('Common', {screen: 'measurement'});
+        navigation.navigate('Common', { screen: 'measurement' });
         break;
 
       case 'pant':
-        navigation.navigate('Common', {screen: 'pantCustomization'});
+        navigation.navigate('Common', { screen: 'pantCustomization' });
         break;
 
       default:
@@ -93,7 +93,7 @@ function ViewOrder({navigation}) {
   };
 
   const handleCloths = () => {
-    navigation.navigate('Common', {screen: 'clothcategory'});
+    navigation.navigate('Common', { screen: 'clothcategory' });
   };
 
   const handleFileUpload = () => {
@@ -110,7 +110,7 @@ function ViewOrder({navigation}) {
         // includeBase64: false,
         noData: true,
       },
-      ({assets}) => {
+      ({ assets }) => {
         if (assets) {
           const updateList = [...reference, ...assets];
           handleImgUpload(updateList);
@@ -132,7 +132,7 @@ function ViewOrder({navigation}) {
           });
         }),
       );
-      const payload = {reference: _imageList};
+      const payload = { reference: _imageList };
       dispatch(updateOrder(payload));
     } catch (error) {
       console.log(error);
@@ -149,11 +149,11 @@ function ViewOrder({navigation}) {
   };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#87BCBF'}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#87BCBF' }}>
       <ScrollView
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}>
-        <View style={{marginBottom: 10, backgroundColor: '#fff'}}>
+        <View style={{ marginBottom: 10, backgroundColor: '#fff' }}>
           <View style={[styles.horizontalAlign]}>
             <Ionicons
               name="chevron-back"
@@ -175,7 +175,7 @@ function ViewOrder({navigation}) {
 
         {/* Customization */}
         <View>
-          <View style={[styles.flex, {paddingHorizontal: 20}]}>
+          <View style={[styles.flex, { paddingHorizontal: 20 }]}>
             <Text style={[styles.title]}>customization</Text>
             {!reference && (
               <Pressable onPress={() => handleCustomization()}>
@@ -215,7 +215,7 @@ function ViewOrder({navigation}) {
                   </View>
                 ))}
               </View>
-              <View style={{marginTop: 20, alignItems: 'center'}}>
+              <View style={{ marginTop: 20, alignItems: 'center' }}>
                 <Pressable
                   // onPress={handleImgUpload}
                   onPress={handleFileUpload}
@@ -243,7 +243,7 @@ function ViewOrder({navigation}) {
             </Fragment>
           ) : (
             // Customization by App
-            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               {orderType === 'shirt' ? (
                 <MyShirt
                   config={{
@@ -282,7 +282,7 @@ function ViewOrder({navigation}) {
                   <View style={styles.measurement}>
                     <AttributeView label="Body Type" value={config.bodyType} />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView
                       label="Shirt Size"
                       value={config.shirtSize}
@@ -294,7 +294,7 @@ function ViewOrder({navigation}) {
                       value={config.shoulderType}
                     />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Height" value={config.height} />
                   </View>
                   <View style={styles.measurement}>
@@ -304,7 +304,7 @@ function ViewOrder({navigation}) {
 
                 <View>
                   <Text style={styles.label}>Notes / Instructions</Text>
-                  <Text style={[styles.value, {fontSize: 14}]}>
+                  <Text style={[styles.value, { fontSize: 14 }]}>
                     {config.notes}
                   </Text>
                 </View>
@@ -316,7 +316,7 @@ function ViewOrder({navigation}) {
                   <View style={styles.measurement}>
                     <AttributeView label="Pant Type" value={config.pant} />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Rise Type" value={config.rise} />
                   </View>
                   <View style={styles.measurement}>
@@ -325,7 +325,7 @@ function ViewOrder({navigation}) {
                       value={config.fastening}
                     />
                   </View>
-                  <View style={[styles.measurement, {marginRight: 0}]}>
+                  <View style={[styles.measurement, { marginRight: 0 }]}>
                     <AttributeView label="Waist" value={config.waist} />
                   </View>
                 </View>
@@ -349,7 +349,9 @@ function ViewOrder({navigation}) {
                 }}>
                 Measurements will collect from:
               </Text>
-              <Text>{measurementAddress}</Text>
+              <Text>{measurementAddress.house_number},{measurementAddress.street},{measurementAddress.area_name},{measurementAddress.city},{measurementAddress.state} - {measurementAddress.pincode}</Text>
+              {measurementAddress.landmark && <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Landmark:</Text> {measurementAddress.landmark}</Text>}
+              <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Contact:</Text> {measurementAddress.contact_number}</Text>
             </View>
           )}
         </View>
@@ -360,10 +362,10 @@ function ViewOrder({navigation}) {
             backgroundColor: '#334856',
             padding: 20,
           }}>
-          <View style={[styles.flex, {marginBottom: 20}]}>
-            <Text style={[styles.title, {color: '#fff'}]}>Cloth Details</Text>
+          <View style={[styles.flex, { marginBottom: 20 }]}>
+            <Text style={[styles.title, { color: '#fff' }]}>Cloth Details</Text>
             <Pressable onPress={() => handleCloths()}>
-              <Text style={{color: '#fff'}}>
+              <Text style={{ color: '#fff' }}>
                 <Ionicons name="pencil-outline" size={14} color="#fff" /> Edit
               </Text>
             </Pressable>
@@ -373,7 +375,7 @@ function ViewOrder({navigation}) {
               // ---------- Cloth selected from app -------------- //
               <Fragment>
                 <View style={styles.iconContainer}>
-                  <Image source={Cloth} style={{flex: 1, width: '100%'}} />
+                  <Image source={Cloth} style={{ flex: 1, width: '100%' }} />
                 </View>
                 <View>
                   <Text style={styles.clothName}>{selectedCloth.name}</Text>
@@ -397,12 +399,12 @@ function ViewOrder({navigation}) {
                   Cloth will be couriered to the below mentioned address (Our
                   Office Address)
                 </Text>
-                <Text style={{color: '#fff'}}>3/235</Text>
-                <Text style={{color: '#fff'}}>test street,</Text>
-                <Text style={{color: '#fff'}}>area</Text>
-                <Text style={{color: '#fff'}}>district</Text>
-                <Text style={{color: '#fff'}}>state</Text>
-                <Text style={{color: '#fff'}}>PIN: 000 000</Text>
+                <Text style={{ color: '#fff' }}>3/235</Text>
+                <Text style={{ color: '#fff' }}>test street,</Text>
+                <Text style={{ color: '#fff' }}>area</Text>
+                <Text style={{ color: '#fff' }}>district</Text>
+                <Text style={{ color: '#fff' }}>state</Text>
+                <Text style={{ color: '#fff' }}>PIN: 000 000</Text>
               </View>
             ) : (
               // -------------- Cloth will pickup from customer location -------------- //
@@ -416,7 +418,9 @@ function ViewOrder({navigation}) {
                   }}>
                   Cloth will pick up from:
                 </Text>
-                <Text style={{color: '#fff'}}>{cloth_pickuplocation}</Text>
+                <Text style={{ color: '#fff' }}>{cloth_pickuplocation.house_number},{cloth_pickuplocation.street},{cloth_pickuplocation.area_name},{cloth_pickuplocation.city},{cloth_pickuplocation.state} - {cloth_pickuplocation.pincode}</Text>
+                {cloth_pickuplocation.landmark && <Text style={{ color: '#fff', marginTop: 5 }}><Text style={{ fontWeight: 'bold' }}>Landmark:</Text> {cloth_pickuplocation.landmark}</Text>}
+                <Text style={{ color: '#fff', marginTop: 5 }}><Text style={{ fontWeight: 'bold' }}>Contact:</Text> {cloth_pickuplocation.contact_number}</Text>
               </View>
             )}
           </View>
@@ -424,18 +428,22 @@ function ViewOrder({navigation}) {
 
         {/* order delivery details */}
         {orderStatus !== 'draft' && (
-          <View style={[styles.references, {backgroundColor: '#f3f3f3'}]}>
+          <View style={[styles.references, { backgroundColor: '#fff' }]}>
             <Text style={styles.title}>Delivery Details</Text>
-            <View style={{marginBottom: 20}}>
-              <Text style={styles.subtitle}>Address</Text>
-              <Text>{deliveryAddress}</Text>
+            <View style={{ marginVertical: 20 }}>
+              <Text style={[styles.subtitle, { marginBottom: 0 }]}>Address</Text>
+              <Fragment>
+                <Text>{deliveryAddress.house_number},{deliveryAddress.street},{deliveryAddress.area_name},{deliveryAddress.city},{deliveryAddress.state} - {deliveryAddress.pincode}</Text>
+                {deliveryAddress.landmark && <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: '500', color: '#334856' }}>Landmark:</Text> {deliveryAddress.landmark}</Text>}
+                <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: '500', color: '#334856' }}>Contact:</Text> {deliveryAddress.contact_number}</Text>
+              </Fragment>
             </View>
-            <View style={{marginBottom: 20}}>
-              <Text style={styles.subtitle}>Date of Delivery</Text>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={[styles.subtitle, { marginBottom: 0 }]}>Date of Delivery</Text>
               <Text>{orderDeliveryDate || 'Yet to decided'}</Text>
             </View>
-            <View style={{marginBottom: 20}}>
-              <Text style={styles.subtitle}>Status</Text>
+            <View style={{ marginBottom: 20 }}>
+              <Text style={[styles.subtitle, { marginBottom: 0 }]}>Status</Text>
               <Text>{orderDeliveryStatus}</Text>
             </View>
           </View>
@@ -444,13 +452,13 @@ function ViewOrder({navigation}) {
         {/* Payment details */}
         {orderStatus !== 'draft' && (
           <View style={[styles.references]}>
-            <Text style={[styles.title, {marginBottom: 20}]}>
+            <Text style={[styles.title, { marginBottom: 20 }]}>
               Payment Details
             </Text>
             <View
               style={[
                 styles.detailContainer,
-                {marginTop: 0, borderRadius: 10},
+                { marginTop: 0, borderRadius: 10 },
               ]}>
               <View style={styles.row}>
                 <Text style={styles.label}>Stitching Price</Text>
@@ -485,30 +493,30 @@ function ViewOrder({navigation}) {
 
         {(orderDeliveryStatus !== 'complete' ||
           orderPaymentStatus !== 'complete') && (
-          <View
-            style={[
-              styles.addressSection,
-              {
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                paddingTop: 10,
-              },
-            ]}>
-            <Button
-              type="primaryoutline"
-              label="cancel order"
-              width={(Dimensions.get('window').width - 50) / 2}
-              onPress={() => handleCancelOrder()}
-            />
-            <Button
-              type="primary"
-              label="continue"
-              width={(Dimensions.get('window').width - 50) / 2}
-              onPress={() => handleContinue()}
-            />
-          </View>
-        )}
+            <View
+              style={[
+                styles.addressSection,
+                {
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  paddingTop: 10,
+                },
+              ]}>
+              <Button
+                type="primaryoutline"
+                label="cancel order"
+                width={(Dimensions.get('window').width - 50) / 2}
+                onPress={() => handleCancelOrder()}
+              />
+              <Button
+                type="primary"
+                label="continue"
+                width={(Dimensions.get('window').width - 50) / 2}
+                onPress={() => handleContinue()}
+              />
+            </View>
+          )}
       </ScrollView>
     </SafeAreaView>
   );

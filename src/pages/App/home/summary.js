@@ -13,6 +13,8 @@ import {
   Alert,
   AlertIOS,
   Pressable,
+  TouchableOpacity,
+  ToastAndroid,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Shirt from '../../../reusables/customization/shirt';
@@ -20,6 +22,7 @@ import AttributeView from './attributeView';
 import Button from '../../../reusables/button';
 
 import Cloth from './../../../assets/images/cloth.jpg';
+import Icon5 from './../../../assets/icons/icon-1.png';
 import axios from 'axios';
 import { HOST } from '../../../../env';
 import { updateOrder, resetOrder } from '../../../redux/slices/order';
@@ -53,8 +56,6 @@ function Summary({ navigation }) {
     price: cloth_total_price,
     ...cloth,
   };
-
-  const [address, setAddress] = useState(deliveryAddress || '');
 
   const addMeasurement = async (payload) => {
     try {
@@ -108,6 +109,10 @@ function Summary({ navigation }) {
 
     let _payload = _payload1;
     _payload['measurementId'] = measurementId;
+
+    _payload['cloth_pickuplocation'] = _payload?.cloth_pickuplocation?.id;
+    _payload['deliveryAddress'] = _payload?.deliveryAddress?.id;
+    _payload['measurementAddress'] = _payload?.measurementAddress?.id;
 
     const response = await axios.post(url, _payload, {
       withCredentials: true,
@@ -220,7 +225,6 @@ function Summary({ navigation }) {
     try {
       dispatch(setLoader(true));
       const payload = {
-        deliveryAddress: address,
         orderStatus: 'draft',
         orderDeliveryStatus: 'pending',
         orderPaymentStatus: 'pending',
@@ -228,16 +232,31 @@ function Summary({ navigation }) {
       dispatch(updateOrder(payload));
 
       const _orders = { ...orders };
-      const id = _orders.cloth.id;
+
+      const id = _orders?.cloth?.id;
       delete _orders.cloth;
-      const _payload1 = {
+
+      let _payload1 = {
         ..._orders,
-        cloth: id,
-        deliveryAddress: address,
         orderStatus: 'draft',
         orderDeliveryStatus: 'pending',
         orderPaymentStatus: 'pending',
-      };
+      }
+
+      if (id) {
+        _payload1['cloth'] = id
+      }
+
+      if (_orders.measurementAddress?.id) {
+        _payload1['measurementAddress'] = _orders.measurementAddress?.id
+      }
+      if (_orders.cloth_pickuplocation?.id) {
+        _payload1['cloth_pickuplocation'] = _orders.cloth_pickuplocation?.id
+      }
+      if (_orders.deliveryAddress?.id) {
+        _payload1['deliveryAddress'] = _orders.deliveryAddress?.id
+      }
+
       delete _payload1.reference;
 
       if (orders?.id) {
@@ -435,7 +454,9 @@ function Summary({ navigation }) {
                 }}>
                 Measurements will collect from:
               </Text>
-              <Text>{measurementAddress}</Text>
+              <Text>{measurementAddress.house_number},{measurementAddress.street},{measurementAddress.area_name},{measurementAddress.city},{measurementAddress.state} - {measurementAddress.pincode}</Text>
+              {measurementAddress.landmark && <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Landmark:</Text> {measurementAddress.landmark}</Text>}
+              <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Contact:</Text> {measurementAddress.contact_number}</Text>
             </View>
           )}
         </View>
@@ -497,26 +518,76 @@ function Summary({ navigation }) {
                   }}>
                   Cloth will pick up from:
                 </Text>
-                <Text style={{ color: '#fff' }}>{cloth_pickuplocation}</Text>
+
+                <Text style={{ color: '#fff' }}>{cloth_pickuplocation.house_number},{cloth_pickuplocation.street},{cloth_pickuplocation.area_name},{cloth_pickuplocation.city},{cloth_pickuplocation.state} - {cloth_pickuplocation.pincode}</Text>
+                {cloth_pickuplocation.landmark && <Text style={{ color: '#fff', marginTop: 5 }}><Text style={{ fontWeight: 'bold' }}>Landmark:</Text> {cloth_pickuplocation.landmark}</Text>}
+                <Text style={{ color: '#fff', marginTop: 5 }}><Text style={{ fontWeight: 'bold' }}>Contact:</Text> {cloth_pickuplocation.contact_number}</Text>
               </View>
             )}
           </View>
         </View>
 
-        <View style={[styles.addressSection, { paddingBottom: 0 }]}>
-          <Text style={styles.subtitle}>Delivery Address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="H. No, Street, City, State, Pincode"
-            multiline
-            numberOfLines={7}
-            value={address}
-            onChangeText={_address => {
-              setAddress(_address);
-            }}
-            underlineColorAndroid="transparent"
-            textAlignVertical="top"
-          />
+        <View style={[styles.addressSection]}>
+          <View style={[styles.flex, { marginBottom: 10 }]}>
+            <Text style={[styles.title, { marginBottom: 0 }]}>Delivery Address</Text>
+            {deliveryAddress && <Pressable onPress={() => {
+              navigation.push('Common', {
+                screen: 'addresses',
+                params: {
+                  isOrder: true,
+                  addressFor: 'deliveryAddress',
+                  selectedAddress: deliveryAddress
+                }
+              })
+            }}>
+              <Text style={{ color: '#000' }}>
+                <Ionicons name="pencil-outline" size={14} color="#000" /> Edit
+              </Text>
+            </Pressable>}
+          </View>
+          {deliveryAddress ? (
+            <Fragment>
+              <Text>{deliveryAddress.house_number},{deliveryAddress.street},{deliveryAddress.area_name},{deliveryAddress.city},{deliveryAddress.state} - {deliveryAddress.pincode}</Text>
+              {deliveryAddress.landmark && <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Landmark:</Text> {deliveryAddress.landmark}</Text>}
+              <Text style={{ marginTop: 5 }}><Text style={{ fontWeight: 'bold', color: '#000' }}>Contact:</Text> {deliveryAddress.contact_number}</Text>
+            </Fragment>
+          ) : (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                overflow: 'hidden',
+                backgroundColor: '#f9d8ce',
+                padding: 7
+              }}>
+                <Image
+                  source={Icon5}
+                  style={{ alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={{ width: Dimensions.get('screen').width - 180, paddingLeft: 10 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.push('Common', {
+                      screen: 'addresses',
+                      params: {
+                        isOrder: true,
+                        addressFor: 'deliveryAddress',
+                        selectedAddress: deliveryAddress
+                      }
+                    })
+                  }}>
+                  <Fragment>
+                    <Text style={[styles.link, { fontWeight: '500' }]}>
+                      Select Address for delivery
+                    </Text>
+                  </Fragment>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
 
         <View
@@ -533,14 +604,14 @@ function Summary({ navigation }) {
             type="primaryoutline"
             label="save for later"
             width={(Dimensions.get('window').width - 50) / 2}
-            disabled={!address}
+            disabled={!deliveryAddress}
             onPress={() => updateDeliveryAddress(true)}
           />
           <Button
             type="primary"
             label="continue to checkout"
             width={(Dimensions.get('window').width - 50) / 2}
-            disabled={!address}
+            disabled={!deliveryAddress}
             onPress={() => updateDeliveryAddress()}
           />
         </View>
@@ -598,9 +669,9 @@ const styles = StyleSheet.create({
   iconContainer: {
     backgroundColor: '#fff',
     borderRadius: 50,
+    overflow: 'hidden',
     width: 75,
     height: 75,
-    overflow: 'hidden',
     marginRight: 20,
   },
   clothName: {
@@ -635,6 +706,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     marginBottom: 10,
+  },
+  flex: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

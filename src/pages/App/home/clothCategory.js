@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useMemo} from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Image,
   View,
@@ -22,13 +22,12 @@ import Icon11 from './../../../assets/icons/icon-11.png';
 import Icon12 from './../../../assets/icons/icon-12.png';
 import BACKGROUND_BANNER from './../../../assets/images/cloth.jpg';
 import Address from './address';
-import {useDispatch, useSelector} from 'react-redux';
-import {updateOrder} from '../../../redux/slices/order';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateOrder } from '../../../redux/slices/order';
 
-function ClothCategory({navigation}) {
+function ClothCategory({ navigation }) {
   const dispatch = useDispatch();
   const order = useSelector(state => state.orders);
-  const [actionSheet, setActionSheet] = useState(false);
   const [courierSheet, setCourierSheet] = useState(false);
 
   const updateAddress = async payload => {
@@ -55,39 +54,6 @@ function ClothCategory({navigation}) {
     }
   };
 
-  const ActionSheetModal = useMemo(
-    () => (
-      <Modal
-        isVisible={actionSheet}
-        style={{
-          margin: 0,
-          justifyContent: 'flex-end',
-        }}>
-        <View>
-          <Address
-            setActionSheet={setActionSheet}
-            setAddress={address => {
-              const _address = `${address.fullAddress}${
-                address.floor ? ', ' + address.floor : ''
-              }${address.landmark ? ', ' + address.landmark : ''}`;
-              console.log(_address);
-              const payload = {
-                cloth_pickuplocation: _address,
-                cloth_length: 0,
-                cloth_total_price: 0,
-                cloth: null,
-                cloth_couriered: false,
-              };
-              updateAddress(payload);
-            }}
-          />
-        </View>
-      </Modal>
-    ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [actionSheet],
-  );
-
   const CourierActionSheetModal = useMemo(
     () => (
       <Modal
@@ -104,7 +70,7 @@ function ClothCategory({navigation}) {
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
             }}>
-            <Text style={{fontWeight: '500', fontSize: 15, marginBottom: 15}}>
+            <Text style={{ fontWeight: '500', fontSize: 15, marginBottom: 15 }}>
               Courier Address (Our Office Address)
             </Text>
             <Text>3/235</Text>
@@ -113,7 +79,7 @@ function ClothCategory({navigation}) {
             <Text>district</Text>
             <Text>state</Text>
             <Text>PIN: 000 000</Text>
-            <View style={{marginTop: 20}}>
+            <View style={{ marginTop: 20 }}>
               <Button
                 type="primary"
                 label="continue"
@@ -141,7 +107,7 @@ function ClothCategory({navigation}) {
     <ScrollView>
       <View style={styles.imageContainer}>
         <Image
-          style={{flex: 1, width: '100%'}}
+          style={{ flex: 1, width: '100%' }}
           source={BACKGROUND_BANNER}
           resizeMode="cover"
         />
@@ -158,20 +124,20 @@ function ClothCategory({navigation}) {
                     </View>}
                 </View>
             </View> */}
-      <View style={{paddingHorizontal: 20, position: 'relative'}}>
+      <View style={{ paddingHorizontal: 20, position: 'relative' }}>
         <View style={styles.designs}>
-          <View style={{borderBottomWidth: 1, borderColor: '#f1f3f4'}}>
+          <View style={{ borderBottomWidth: 1, borderColor: '#f1f3f4' }}>
             <Pressable onPress={() => navigation.navigate('clothselection')}>
               <View style={styles.desginView}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View style={styles.iconContainer}>
                     <Image
                       source={Icon10}
-                      style={{flex: 1}}
+                      style={{ flex: 1 }}
                       resizeMode="contain"
                     />
                   </View>
-                  <View style={{width: Dimensions.get('screen').width - 180}}>
+                  <View style={{ width: Dimensions.get('screen').width - 180 }}>
                     <Text style={styles.link}>shop for cloth</Text>
                   </View>
                 </View>
@@ -179,21 +145,29 @@ function ClothCategory({navigation}) {
               </View>
             </Pressable>
           </View>
-          <TouchableOpacity onPress={() => setActionSheet(true)}>
+          <TouchableOpacity onPress={() => {
+            navigation.push('Common', {
+              screen: 'addresses',
+              params: {
+                isOrder: true,
+                addressFor: 'cloth_pickuplocation'
+              }
+            })
+          }}>
             <View
               style={[
                 styles.desginView,
-                {borderBottomWidth: 1, borderColor: '#f1f3f4'},
+                { borderBottomWidth: 1, borderColor: '#f1f3f4' },
               ]}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon11}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <Text style={styles.link}>pickup my cloth</Text>
                 </View>
               </View>
@@ -202,15 +176,15 @@ function ClothCategory({navigation}) {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setCourierSheet(true)}>
             <View style={[styles.desginView]}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View style={styles.iconContainer}>
                   <Image
                     source={Icon12}
-                    style={{flex: 1}}
+                    style={{ flex: 1 }}
                     resizeMode="contain"
                   />
                 </View>
-                <View style={{width: Dimensions.get('screen').width - 180}}>
+                <View style={{ width: Dimensions.get('screen').width - 180 }}>
                   <Text style={styles.link}>courier my cloth</Text>
                 </View>
               </View>
@@ -219,14 +193,13 @@ function ClothCategory({navigation}) {
           </TouchableOpacity>
           <View>
             <Image
-              style={{width: Dimensions.get('screen').width - 40, height: 90}}
+              style={{ width: Dimensions.get('screen').width - 40, height: 90 }}
               source={BottomBG}
               resizeMode="cover"
             />
           </View>
         </View>
       </View>
-      {ActionSheetModal}
       {CourierActionSheetModal}
     </ScrollView>
   );
@@ -246,7 +219,7 @@ const styles = StyleSheet.create({
   },
   boxWithShadow: {
     shadowColor: '#666',
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 15,
@@ -279,7 +252,7 @@ const styles = StyleSheet.create({
     height: 45,
     alignItems: 'center',
   },
-  link: {color: '#305F72', fontSize: 16, textTransform: 'capitalize'},
+  link: { color: '#305F72', fontSize: 16, textTransform: 'capitalize' },
 });
 
 export default ClothCategory;
